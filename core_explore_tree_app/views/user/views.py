@@ -4,7 +4,6 @@
 from core_main_app.utils.rendering import render
 
 
-
 def core_explore_tree_index(request):
     """ Page that allows to see the exploration tree.
 
@@ -14,6 +13,5 @@ def core_explore_tree_index(request):
     Returns:
 
     """
-
 
     return render(request,'')

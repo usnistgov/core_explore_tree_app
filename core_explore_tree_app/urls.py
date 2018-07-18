@@ -5,6 +5,6 @@ from django.conf.urls import url
 from core_explore_tree_app.views.user import views as common_views
 
 urlpatterns = [
-    url(r'^$', common_views.index,
+    url(r'^$', common_views.core_explore_tree_index,
         name='core_explore_tree_index'),
 ]

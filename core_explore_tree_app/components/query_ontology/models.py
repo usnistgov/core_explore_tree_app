@@ -1,6 +1,6 @@
-""" Query Onthology model
+""" Query Ontology model
 """
-from django_mongoengine import fields, Document, EmbeddedDocument
+from django_mongoengine import fields, Document
 from mongoengine import errors as mongoengine_errors
 
 from core_main_app.commons.regex import NOT_EMPTY_OR_WHITESPACES
@@ -11,11 +11,11 @@ from core_main_app.components.template.models import Template
 class QueryOntology(Document):
     """ Ontology of queries to generate the navigation tree
     """
-    name = StringField(blank=False, regex=NOT_EMPTY_OR_WHITESPACES)
-    status = IntField(default=0, required=True)  # 0: Uploaded; 1: Active; 2: Blank; -1: Deleted
-    last_modification_date = DateTimeField(required=False)
-    content = StringField(required=True)
-    template = ReferenceField(Template, required=False)
+    title = fields.StringField(blank=False, regex=NOT_EMPTY_OR_WHITESPACES)
+    status = fields.IntField(default=0, blank=False)  # 0: Uploaded; 1: Active; 2: Blank; -1: Deleted
+    last_modification_date = fields.DateTimeField(blank=True)
+    content = fields.StringField(blank=False)
+    template = fields.ReferenceField(Template, blank=True)
 
     @staticmethod
     def get_all():
