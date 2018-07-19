@@ -2,6 +2,7 @@
 """
 from django_mongoengine import Document, fields
 from mongoengine import errors as mongoengine_errors
+from mongoengine.errors import NotUniqueError
 
 from core_main_app.commons import exceptions
 
@@ -14,13 +15,25 @@ class Navigation(Document):
     children = fields.ListField(blank=True)
     options = fields.DictField(blank=True)
 
+    def save_object(self):
+        """ Custom save
+
+        Returns:
+
+        """
+        try:
+            return self.save()
+        except NotUniqueError:
+            raise exceptions.ModelError("Unable to save the navigation object: not unique.")
+        except Exception as ex:
+            raise exceptions.ModelError(ex.message)
+
     @staticmethod
     def get_all():
         """ Get all Navigation.
 
-        Args:
-
         Returns:
+            Navigation(obj): Navigation object list
 
         """
         return Navigation.objects.all()
@@ -33,7 +46,7 @@ class Navigation(Document):
             navigation_id:
 
         Returns:
-            Navigation(obj): Navigation object with the given id
+            Navigation(obj): Navigation object
 
         """
         try:
@@ -42,3 +55,16 @@ class Navigation(Document):
             raise exceptions.DoesNotExist(e.message)
         except Exception as ex:
             raise exceptions.ModelError(ex.message)
+
+    @staticmethod
+    def get_by_name(navigation_name):
+        """ Return the object with the given name.
+
+        Args:
+            navigation_name:
+
+        Returns:
+            Navigation(obj): Navigation object list
+
+        """
+        return Navigation.objects(name=str(navigation_name)).all()

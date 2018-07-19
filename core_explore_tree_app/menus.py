@@ -16,5 +16,5 @@ Menu.add_item(
 )
 
 Menu.add_item(
-    "main", MenuItem(EXPLORE_TREE_MENU_NAME, "core_explore_tree_index")
+    "main", MenuItem(EXPLORE_TREE_MENU_NAME, reverse("core_explore_tree_index"))
 )

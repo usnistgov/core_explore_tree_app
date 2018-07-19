@@ -50,6 +50,15 @@ def get_by_status(status):
     return QueryOntology.get_by_status(status)
 
 
+def get_active():
+    """ Return the only active ontology
+
+    Returns:
+
+    """
+    return QueryOntology.get_active()
+
+
 def get_all():
     """ Get all the QueryOntology.
 

@@ -3,6 +3,7 @@
 from django_mongoengine import fields, Document
 from mongoengine import errors as mongoengine_errors
 
+from core_explore_tree_app.commons.enums import QueryOntologyStatus
 from core_main_app.commons.regex import NOT_EMPTY_OR_WHITESPACES
 from core_main_app.commons import exceptions
 from core_main_app.components.template.models import Template
@@ -21,8 +22,6 @@ class QueryOntology(Document):
     def get_all():
         """ Get all Query Ontology.
 
-        Args:
-
         Returns:
 
         """
@@ -33,11 +32,26 @@ class QueryOntology(Document):
         """ Get all Query Ontology with the given status.
 
         Args:
+            status:
 
         Returns:
 
         """
         return QueryOntology.objects(status=status).all()
+
+    @staticmethod
+    def get_active():
+        """ Return the only active ontology
+
+        Returns:
+
+        """
+        try:
+            return QueryOntology.objects.get(status=QueryOntologyStatus.active.value)
+        except mongoengine_errors.DoesNotExist as e:
+            raise exceptions.DoesNotExist(e.message)
+        except Exception as ex:
+            raise exceptions.ModelError(ex.message)
 
     @staticmethod
     def get_by_id(query_ontology_id):

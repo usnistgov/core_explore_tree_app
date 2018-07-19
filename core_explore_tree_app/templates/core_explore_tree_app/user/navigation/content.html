@@ -1,0 +1,43 @@
+<!-- template-based caching -->
+<div id="tree-panel" class="col-sm-4 col-md-3 sidebar">
+    <div id="tree">
+        <h4 id="tree-loading">
+            <i class="fa fa-spinner fa-pulse fa-fw"></i>
+            <span>Loading tree...</span>
+        </h4>
+        <ul id="tree-details" class="hide">
+            <li class="root"><i class="fa fa-database" ></i> Database</li>
+            {{ data.navigation_tree | safe }}
+        </ul>
+    </div>
+    <div class="navigation_id" style="display: none;">{{ data.navigation_id }}</div>
+</div>
+
+<div id="explore-panel" class="col-sm-8 col-md-9 main">
+    <!-- spinner for initial load -->
+    <div id="explorer-panel-transparent-bgd" style="display:none;">
+        <h4 id="explore-panel-loading" style="display:none;">
+            <i class="fa fa-spinner fa-pulse fa-fw fa-align-center"></i>
+            <span>Loading ...</span>
+        </h4>
+    </div>
+    <!-- to be uncommented for download feature -->
+    <!--<button id="explore-view-download" href="#" class="btn btn-default pull-right" disabled>-->
+        <!--<i class="fa fa-download"></i> Download-->
+    <!--</button>-->
+    <div id="explore-view" style="margin-top: 50px;">
+        <p class="alert alert-info">
+            <i class="fa fa-question-circle"></i> Please browse the left panel and select a viewable object to toggle
+            this screen.
+        </p>
+    </div>
+
+    <div id="explore-view-error" style="margin-top: 50px; display: none;">
+        <p class="alert alert-danger">
+            <i class="fa fa-exclamation-triangle"></i> An error occurred while browsing the repository. If you keep
+            seeing this message, please <a href="{% url 'core_website_app_contact' %}">contact an administrator</a>.
+        </p>
+    </div>
+</div>
+
+

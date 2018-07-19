@@ -1,0 +1,93 @@
+
+.highlight {
+    background-color: lightblue;
+    padding: 0.25em;
+}
+
+#tree li {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+div#tree-panel {
+    /*margin-top: 89px;*/
+}
+
+div#tree ul {
+  list-style: none;
+  line-height: 2em;
+  padding: 5px !important;
+}
+
+div#tree ul li {
+  font-size: 16px;
+  position: relative;
+
+  cursor: pointer;
+}
+
+div#tree ul li:before {
+  position: absolute;
+  left: -15px;
+  top: 0px;
+  content: '';
+  display: block;
+  border-left: 1px solid #ddd;
+  height: 1em;
+  border-bottom: 1px solid #ddd;
+  width: 10px;
+}
+
+div#tree ul li:after {
+  position: absolute;
+  left: -15px;
+  bottom: -7px;
+  content: '';
+  display: block;
+  border-left: 1px solid #ddd;
+  height: 100%;
+}
+
+div#tree ul li.root {
+}
+
+div#tree ul li.root:before {
+  display: none;
+}
+
+div#tree ul li.root:after {
+  display: none;
+}
+
+div#tree ul li:last-child:after {
+  display: none;
+}
+
+.empty-text {
+    text-align: center;
+    font-style: italic;
+}
+
+.section-full-header {
+    font-size: 2em;
+    padding-bottom: 9px;
+    margin: 40px 0 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.section-header {
+    color: #cfcfcf;
+    padding: 0.25em;
+    background-image: linear-gradient(to bottom, #3c3c3c 0%, #222 100%);
+    background-repeat: repeat-x;
+}
+
+#xsdForm, #XMLHolder {
+    margin-top: 0.5em;
+}
+
+.view-data-table>tbody>tr>th {
+    width: 30%;
+    font-weight: bold;
+}
