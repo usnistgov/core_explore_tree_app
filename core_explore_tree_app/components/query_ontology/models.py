@@ -29,6 +29,17 @@ class QueryOntology(Document):
         return QueryOntology.objects.all()
 
     @staticmethod
+    def get_by_status(status):
+        """ Get all Query Ontology with the given status.
+
+        Args:
+
+        Returns:
+
+        """
+        return QueryOntology.objects(status=status).all()
+
+    @staticmethod
     def get_by_id(query_ontology_id):
         """ Return the object with the given id.
 

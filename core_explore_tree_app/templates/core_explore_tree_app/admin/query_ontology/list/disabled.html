@@ -19,7 +19,11 @@
                 {{ object.template.display_name }}
             </td>
             <td>
-                <!-- Actions -->
+                <span class="icon legend restore" objectid="{{ object.id }}">
+                    <a class="btn btn-default" href="#"><i class="fa fa-undo"></i> Restore </a>
+                </span>
+                {% url 'admin:core_explore_tree_app_delete' object.id as delete_url %}
+                {% include 'core_main_app/common/buttons/delete.html' %}
             </td>
         </tr>
     {% empty %}

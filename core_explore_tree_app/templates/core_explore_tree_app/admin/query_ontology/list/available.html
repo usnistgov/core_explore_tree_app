@@ -3,7 +3,7 @@
 {% block box_title %}Available{% endblock %}
 
 {% block box_tools %}
-    <a href="{% url 'admin:core_exploration_tree_app_upload_query_ontology'%}" class="pull-right btn btn-default">
+    <a href="{% url 'admin:core_explore_tree_app_upload'%}" class="pull-right btn btn-default">
         <i class="fa fa-upload"></i> Upload {{ data.object_name }}
     </a>
 {% endblock %}
@@ -13,6 +13,7 @@
     <tr>
         <th width="35%">{{ data.object_name }}</th>
         <th>Associated template</th>
+        <th>Status</th>
         <th>Actions</th>
     </tr>
 
@@ -25,12 +26,33 @@
                 {{ object.template.display_name }}
             </td>
             <td>
-                <!-- Actions -->
+                {% if object.status == data.status.active.value %}
+                    Active
+                {% else %}
+                    Uploaded
+                {% endif %}
+            </td>
+            <td>
+                {% if object.status != data.status.active.value %}
+                    <span class="icon legend activate" objectid="{{ object.id }}">
+                        <a class="btn btn-success" href="#"><i class="fa fa-play"></i> Activate </a>
+                    </span>
+                {% endif %}
+                {% url 'admin:core_explore_tree_app_edit' object.id as edit_url %}
+                {% include 'core_main_app/common/buttons/edit.html' %}
+                <a class="btn btn-default" href="{% url 'admin:core_explore_tree_app_download' pk=object.id %}">
+                    <i class="fa fa-download"></i> Download
+                </a>
+                {% if object.status != data.status.active.value %}
+                    <span class="icon legend disable" objectid="{{ object.id }}">
+                        <a class="btn btn-warning" href="#"><i class="fa fa-trash"></i> Disable </a>
+                    </span>
+                {% endif %}
             </td>
         </tr>
     {% empty %}
         <tr>
-            <td class="empty" colspan="3">
+            <td class="empty" colspan="4">
                 No {{ data.object_name }} uploaded.
             </td>
         </tr>

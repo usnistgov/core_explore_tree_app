@@ -6,8 +6,8 @@ from menu import Menu, MenuItem
 from core_explore_tree_app.settings import EXPLORE_TREE_MENU_NAME
 
 ontology_children = (
-    MenuItem("OWL files", reverse("admin:core_exploration_tree_app_query_ontology"), icon="list"),
-    MenuItem("Upload New OWL", reverse("admin:core_exploration_tree_app_upload_query_ontology"), icon="upload"),
+    MenuItem("OWL files", reverse("admin:core_explore_tree_app_query_ontology"), icon="list"),
+    MenuItem("Upload New OWL", reverse("admin:core_explore_tree_app_upload"), icon="upload"),
 
 )
 
