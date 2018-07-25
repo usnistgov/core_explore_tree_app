@@ -2,6 +2,7 @@
 """
 
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.staticfiles import finders
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
 from django.utils.html import escape as html_escape
@@ -120,7 +121,29 @@ def upload_query_ontology(request):
 
 
 @staff_member_required
-def download_query_ontology(request, pk):
+def download_blank_query_ontology(request):
+    """ Download ontology.
+
+    Args:
+        request:
+        pk:
+
+    Returns:
+
+    """
+    # open the blank owl file
+    owl_file = open(finders.find('core_explore_tree_app/common/owl/blank.owl'))
+    # retrieve the content of it
+    content = owl_file.read()
+    # return the file
+    return get_file_http_response(file_content=content,
+                                  file_name='blank',
+                                  content_type="application/xml",
+                                  extension=".owl")
+
+
+@staff_member_required
+def download_query_ontology(request, pk=None):
     """ Download ontology.
 
     Args:

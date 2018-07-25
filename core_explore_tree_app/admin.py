@@ -10,6 +10,8 @@ from core_explore_tree_app.views.admin import ajax as admin_ajax
 admin_urls = [
     url(r'^query-ontology/upload$', admin_views.upload_query_ontology,
         name='core_explore_tree_app_upload'),
+    url(r'^query-ontology/download/$', admin_views.download_blank_query_ontology,
+        name='core_explore_tree_app_download_blank'),
     url(r'^query-ontology/download/(?P<pk>\w+)/$', admin_views.download_query_ontology,
         name='core_explore_tree_app_download'),
     url(r'^query-ontology/disable$', admin_ajax.disable_query_ontology,
