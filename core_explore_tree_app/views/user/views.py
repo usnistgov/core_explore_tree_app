@@ -17,7 +17,6 @@ navigation_cache = caches['navigation']
 html_tree_cache = caches['html_tree']
 
 
-@cache_page(600 * 15)
 def core_explore_tree_index(request):
     """ Page that allows to see the exploration tree.
 
@@ -27,9 +26,8 @@ def core_explore_tree_index(request):
     Returns:
 
     """
-    # Not sure is needed
-    if request.method != "GET":
-        return HttpResponse({}, status=HTTP_405_METHOD_NOT_ALLOWED)
+    context = {}
+    error = None
 
     try:
         # get the active ontology
@@ -46,24 +44,24 @@ def core_explore_tree_index(request):
 
         # get the tree from the cache
         tree_key = navigation.id
-        if tree_key in navigation_cache:
+        if tree_key in html_tree_cache:
             html_tree = html_tree_cache.get(tree_key)
         else:
             # create the html tree
             html_tree = render_navigation_tree(navigation, active_ontology.template.id)
-            html_tree_cache.set(tree_key, navigation)
+            html_tree_cache.set(tree_key, html_tree)
 
-    except exceptions.DoesNotExist as e_does_not_exist:
-        error = {"message": e_does_not_exist.message}
-        return HttpResponse(json.dumps(error), status=HTTP_404_NOT_FOUND)
-    except Exception as e:
-        # FIXME use logger e.message
-        return HttpResponseBadRequest('An error occurred during the generation of the navigation tree.')
+        context = {
+            'navigation_tree': html_tree,
+            'navigation_id': navigation.id
+        }
+    except exceptions.DoesNotExist:
+        error = {"error": "An Ontology should be active to explore. Please contact an admin."}
+    except Exception:
+        error = {"error": "An error occurred during the generation of the navigation tree."}
 
-    context = {
-        'navigation_tree': html_tree,
-        'navigation_id': navigation.id
-    }
+    if error:
+        context.update(error)
 
     assets = {
         "js": [

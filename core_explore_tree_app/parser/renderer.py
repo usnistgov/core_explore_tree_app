@@ -141,7 +141,6 @@ def render_documents(navigation, template_id, number_of_docs=0):
     Return: html with the name of the doc
     """
     doc_tree_html = ""
-    doc_and_content=[]
     number_of_docs = 0
 
     try:
@@ -150,7 +149,6 @@ def render_documents(navigation, template_id, number_of_docs=0):
 
         # Get projection
         projection = navigation.options['projection']
-        navigation_child = get_by_id(navigation_id)
 
         # get filters from parents
         filters = []
@@ -190,7 +188,7 @@ def render_documents(navigation, template_id, number_of_docs=0):
         }
 
         doc_tree_html = li_template.render(Context(context))
-    return (doc_tree_html, number_of_docs)
+    return doc_tree_html, number_of_docs
 
 
 def get_number_of_node_doc(id_node, name, nav_table):
