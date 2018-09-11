@@ -163,6 +163,7 @@ def render_documents(navigation, template_id, number_of_docs=0):
                 navigation = get_by_id(navigation.parent)
 
         # get the documents matching the query
+
         documents = query.execute_query(template_id, filters, projection)
 
         for document in documents:

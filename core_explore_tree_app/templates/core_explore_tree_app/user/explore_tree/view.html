@@ -1,5 +1,4 @@
 <h1 class="section-full-header">{{ header }}</h1>
-
 {% for view in views %}
     {% if type == "leaf" %}
         {% include 'core_explore_tree_app/user/explore_tree/views/leaf.html' with view=view %}

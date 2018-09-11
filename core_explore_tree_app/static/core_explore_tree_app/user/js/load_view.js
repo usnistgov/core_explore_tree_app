@@ -12,7 +12,7 @@ var removeHighlight = function() {
 
 var filename = "";
 var text = "";
-var curent_node;
+var current_node;
 var xml_doc_id;
 
 $('#explorer-panel-transparent-bgd').css({
@@ -59,14 +59,14 @@ downloadOptions_file = function(){
 }
 
 /**
-* Download the document
+* Download Options
 */
 downloadExploreTree = function(){
     $('#btn.download').on('click', downloadOptions_file());
 }
 
 /**
-* Download the displaying data into an XML document
+*
 */
 download_xml_tree = function(){
   //create the file to write
@@ -79,13 +79,12 @@ download_xml_tree = function(){
 }
 
 /**
-* Download the displaying data into an XML document
+* Download the source file into an XML document
 */
-download_all_xml_tree = function(){
+download_source_file = function(){
   showLoadingSpinner();
-
-  $.ajax({
-      url: "download_xml",
+  $.get({
+      url: "download_source_file",
       method: "GET",
       data: {
           file_name: filename,
@@ -94,41 +93,43 @@ download_all_xml_tree = function(){
       success: function(data) {
         hideLoadingSpinner();
         var link = document.createElement('a');
-        link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
+        var parser = new XMLSerializer().serializeToString(data.documentElement);
+        link.setAttribute('href','data:text/xml;charset=utf-8,' + parser);
         link.setAttribute('download', filename);
-        link.click();
-        //$("#dialog-download-options").style.display='none';
-        //document.getElementById("dialog-download-options").style.display='none';
+        link.click()
+        $("#dialog-download-options").dialog( "close" );
       },
       error: function() {
-        console.error("An error occured while downloading the xml document");
-        //$("#dialog-download-options" ).hide();
+        console.error("An error occurred while downloading the xml document");
       }
     })
 }
 
 /**
-* Download data corrolated to the attribute
+* Download the displayed data into an XML document
 */
-download_xml_tree_corrolation = function(event){
+download_displayed_data = function(event){
   showLoadingSpinner();
 
-  $.ajax({
-      url: "download_corrolated_xml",
+  $.get({
+      url: "download_displayed_data",
       method: "GET",
       data: {
           file_name: filename,
           doc_id: xml_doc_id,
-          curent_node: curent_node
+          current_node: current_node
       },
       success: function(data) {
         hideLoadingSpinner();
         var link = document.createElement('a');
-        link.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(data));
+        var parser = new XMLSerializer().serializeToString(data.documentElement);
+        link.setAttribute('href','data:text/xml;charset=utf-8,' + parser);
         link.setAttribute('download', filename);
-        link.click();
+        link.click()
+        $("#dialog-download-options").dialog( "close" );
       },
       error: function() {
+       console.error("An error occurred while downloading the displayed data");
       }
     })
 }
@@ -162,10 +163,10 @@ var displayLeafView = function(event) {
             hideLoadingSpinner();
             showDataPanel(data);
             // set the filename to the current name in case the user wants to download it
-            filename = data.substring(24,data.indexOf("<",24))
+            filename = data.substring(32,data.indexOf("<",32)) // remove the tag <h1 class="section-full-header">
             // retrieve the data in case the user wants to download the displaying data
             text = data
-            curent_node = nodeId
+            current_node = nodeId
         },
         error: function() {
             showErrorPanel();
@@ -228,7 +229,7 @@ var displayLinkView = function(event) {
             // set the filename to the current name in case the user wants to download it
             filename = f.substring(35,f.indexOf("<",24))
             text = JSON.stringify(data)
-            curent_node = nodeId
+            current_node = nodeId
         },
         error: function() {
             showErrorPanel();

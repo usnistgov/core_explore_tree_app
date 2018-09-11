@@ -9,6 +9,10 @@ from core_explore_tree_app.views.user import views as user_views
 urlpatterns = [
     url(r'^$', user_views.core_explore_tree_index,
         name='core_explore_tree_index'),
-    url(r'^load_view', user_ajax.load_view,
+    url(r'^load_view/$', user_ajax.load_view,
         name='core_explore_tree_load_view'),
+    url(r'^download_source_file/$', user_ajax.download_source_file,
+        name='core_explore_tree_app_download_source_file'),
+    url(r'^download_displayed_data/$', user_ajax.download_displayed_data,
+        name='core_download_displayed_data'),
 ]
