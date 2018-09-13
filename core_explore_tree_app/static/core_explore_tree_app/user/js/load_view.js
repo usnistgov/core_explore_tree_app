@@ -1,15 +1,6 @@
 /**
 * Js file dedicated to display and load tree and data
 */
-
-var removeHighlight = function() {
-    var highlightClass = "highlight";
-
-    $.each($("." + highlightClass), function(index, value) {
-        $(value).removeClass(highlightClass);
-    });
-}
-
 var filename = "";
 var text = "";
 var current_node;
@@ -42,6 +33,19 @@ $('#explore-panel-loading').css({
                   'border-color':'#337ab7'
             });
 
+var removeHighlight = function() {
+    var highlightClass = "highlight";
+    $.each($("." + highlightClass), function(index, value) {
+        $(value).removeClass(highlightClass);
+    });
+}
+
+var showHighlight = function() {
+    var highlightClass = "highlight";
+    $("." + xml_doc_id).closest("span").addClass(highlightClass);
+}
+
+
 /**
 * Shows a dialog to choose dialog options
 */
@@ -59,14 +63,14 @@ downloadOptions_file = function(){
 }
 
 /**
-* Download Options
+* Download the document
 */
 downloadExploreTree = function(){
     $('#btn.download').on('click', downloadOptions_file());
 }
 
 /**
-*
+* Download the displaying data into an XML document
 */
 download_xml_tree = function(){
   //create the file to write
@@ -79,7 +83,7 @@ download_xml_tree = function(){
 }
 
 /**
-* Download the source file into an XML document
+* Download the displaying data into an XML document
 */
 download_source_file = function(){
   showLoadingSpinner();
@@ -167,6 +171,7 @@ var displayLeafView = function(event) {
             // retrieve the data in case the user wants to download the displaying data
             text = data
             current_node = nodeId
+            showHighlight(xml_doc_id);
         },
         error: function() {
             showErrorPanel();
@@ -223,13 +228,13 @@ var displayLinkView = function(event) {
             ref_node_id: nodeId
         },
         success: function(data) {
-            $("span>."+data.doc_id).parents("span:first").addClass("highlight");
             showDataPanel(data);
             var f = JSON.stringify(data)//String(data)
             // set the filename to the current name in case the user wants to download it
             filename = f.substring(35,f.indexOf("<",24))
             text = JSON.stringify(data)
             current_node = nodeId
+            showHighlight(xml_doc_id);
         },
         error: function() {
             showErrorPanel();
