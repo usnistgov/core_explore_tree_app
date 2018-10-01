@@ -32,7 +32,7 @@ chdir(normpath(join(abspath(__file__), pardir)))
 
 setup(
     name="core_explore_tree_app",
-    version="1.0.0-alpha2",
+    version="1.0.0-beta1",
     description="Explore Tree app",
     long_description=long_desc,
     author="NIST IT Lab",
