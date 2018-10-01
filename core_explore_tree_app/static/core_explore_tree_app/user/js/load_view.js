@@ -50,23 +50,7 @@ var showHighlight = function() {
 * Shows a dialog to choose dialog options
 */
 downloadOptions_file = function(){
-  $(function() {
-    $( "#dialog-download-options" ).dialog({
-      modal: true,
-      buttons: {
-        Cancel: function() {
-          $( this ).dialog( "close" );
-        }
-      }
-    });
-  });
-}
-
-/**
-* Download the document
-*/
-downloadExploreTree = function(){
-    $('#btn.download').on('click', downloadOptions_file());
+  $("#select-download-options-modal").modal("show");
 }
 
 /**
@@ -100,8 +84,8 @@ download_source_file = function(){
         var parser = new XMLSerializer().serializeToString(data.documentElement);
         link.setAttribute('href','data:text/xml;charset=utf-8,' + parser);
         link.setAttribute('download', filename);
-        link.click()
-        $("#dialog-download-options").dialog( "close" );
+        link.click();
+        $("#select-download-options-modal").modal("hide");
       },
       error: function() {
         console.error("An error occurred while downloading the xml document");
@@ -114,7 +98,6 @@ download_source_file = function(){
 */
 download_displayed_data = function(event){
   showLoadingSpinner();
-
   $.get({
       url: "download_displayed_data",
       method: "GET",
@@ -127,10 +110,11 @@ download_displayed_data = function(event){
         hideLoadingSpinner();
         var link = document.createElement('a');
         var parser = new XMLSerializer().serializeToString(data.documentElement);
+
         link.setAttribute('href','data:text/xml;charset=utf-8,' + parser);
         link.setAttribute('download', filename);
-        link.click()
-        $("#dialog-download-options").dialog( "close" );
+        link.click();
+        $("#select-download-options-modal").modal("hide");
       },
       error: function() {
        console.error("An error occurred while downloading the displayed data");
@@ -149,7 +133,6 @@ var displayLeafView = function(event) {
     var documentId = nodeClasses[1];
     var nodeId = nodeClasses[2];
     var navigationId = $('.navigation_id').html();
-
     $(this).parents("span:first").addClass("highlight");
 
     xml_doc_id = documentId;

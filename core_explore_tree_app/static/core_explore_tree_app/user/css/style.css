@@ -1,0 +1,12 @@
+.pop_download_label{
+	font-size: smaller;
+	font-weight: bold;
+}
+
+.pop_download_instruction{
+	font-size: 0.8em;
+}
+
+.fa-download:before {
+  content: "\f019";
+}

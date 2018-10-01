@@ -223,58 +223,55 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
         # Get info from main doc
         else:
             # list of queries done on the current document (Main doc)
-            query_list = list()
-            doc_projections = []
-            for value in projection_view["data"]:
-                doc_projections.append(value.get('path'))
-
-            for projection in doc_projections:
-                # Get the MongoDB query path for the parameter that need to be displayed
-                # eg: query_path = dict_content.a.b.c.d.e
-                query_path = {
-                    doc_projections[doc_projections.index(projection)]: 1
-                }
-                # Add the query to the query list for the current doc (Main doc)
-                query_list.append(query_path.keys()[0])
+            query_list = []
+            doc_projections = [value.get('path') for value in projection_view["data"]]
+            query_list = [doc_projections[doc_projections.index(projection)] for projection in doc_projections]
             # Get all results of the queries. type(result_data["data"]) = dict or instance of dict
             result_data["data"] = parser_processview.processview(nav_id, data_id, projection_view["data"])
 
-            i = 0
-            for dict_result in result_data["data"]:
-                for key in dict_result:
-                    # We have only one value as result for the query
-                    if "value" in str(key):
-                        query_path = query_list[i]  # eg: query_path = a.b.c.d
-                        needed_tag = query_path.split(".")  # Get only d (the needed tag)
-                        tag = needed_tag[len(needed_tag) - 1]
-                        dict_tags_values_main_doc[tag] = dict_result[key]
-                    # We have multiple values for this result: all the chemical components
-                    # (dict_result[key] is an inclusion of dicts)
-                    elif "item" in str(key):
-                        # From the inclusion of dict, process the dict into a list and get all the needed values
-                        # values_of_items_from_main_doc = list[list[value1 for dict i,value2 for dict 2, ..]]
-                        # eg: values_of_items_from_main_doc= [l1,l2]
-                        # l1 = [["location", "NIST"], ["Build location X", "59"], "EWI_Build1"]]
-                        # l2 = [["location", "NIST"], ["Build location X", "47"], "EWI_Build2"]]
-                        get_values_items(dict_result[key], values_of_items_from_main_doc)
-                        for list_of_values in values_of_items_from_main_doc:
-                            for value in list_of_values:
-                                # We have a list :value= [displayed parameter, value]
-                                # eg : ["Build location X", "59"]
-                                if len(value) == 2:
-                                    # list_tag_of_items_from_main_doc.append(value[0])
-                                    list_values_of_items_from_main_doc.append(value[1])  # Get the value. eg: 59
-                                # We have only one value (last value in the list. eg: EWI_Build1 in l1)
-                                else:
-                                    list_values_of_items_from_main_doc.append(value)
-                i += 1
+            for query_path, dict_result in zip(query_list, result_data["data"]):
+                # eg: query_path = a.b.c.d
+                # We have only one value as result for the query
+                dict_result_value = dict_result.get("value", None)
+                if dict_result_value is not None:
+                    tag = query_path.split(".")[-1]  # Get only d (the needed tag)
+                    if tag in dict_tags_values_main_doc:
+                        v = dict_tags_values_main_doc[tag]
+                        if isinstance(v, list):
+                            dict_tags_values_main_doc[tag].append(dict_result_value)
+                        else:
+                            dict_tags_values_main_doc[tag] = [dict_tags_values_main_doc[tag], dict_result_value]
+                    else:
+                        dict_tags_values_main_doc[tag] = dict_result_value
 
+                # We have multiple values for this result: all the chemical components
+                # (dict_result[key] is an inclusion of dicts)
+                dict_result_item, dict_result_items = [dict_result.get(_, None) for _ in ["item", "items"]]
+
+                if dict_result_item or dict_result_items:
+                    dict_result_item_v = dict_result_item if dict_result_item is not None else dict_result_items
+                    #dict_result_item_v = [dict_result_item, dict_result_items][dict_result_item not None]
+                    # From the inclusion of dict, process the dict into a list and get all the needed values
+                    # values_of_items_from_main_doc = list[list[value1 for dict i,value2 for dict 2, ..]]
+                    # eg: values_of_items_from_main_doc= [l1,l2]
+                    # l1 = [["location", "NIST"], ["Build location X", "59"], "EWI_Build1"]]
+                    # l2 = [["location", "NIST"], ["Build location X", "47"], "EWI_Build2"]]
+                    get_values_items(dict_result_item_v, values_of_items_from_main_doc)
+                    for list_of_values in values_of_items_from_main_doc:
+                        for value in list_of_values:
+                            # We have a list :value= [displayed parameter, value]
+                            # eg : ["Build location X", "59"]
+                            if len(value) == 2:
+                                # list_tag_of_items_from_main_doc.append(value[0])
+                                list_values_of_items_from_main_doc.append(value[1])  # Get the value. eg: 59
+                            # We have only one value (last value in the list. eg: EWI_Build1 in l1)
+                            else:
+                                list_values_of_items_from_main_doc.append(value)
         view_data["views"].append(result_data)
 
     # Get the displayed data as an XML format in order to download it later #
 
     # STEP 1: Build the XML based on initial tags for the crossed documents:
-
     # Go into the dict of doc_id and queries of cross documents and build the xml for each document
     #  dict_id_and_queries_cross_docs = {id_doc1: [list of queries1], id_doc2: [list of queries2]}
     xml_cross_queries_string = ""
@@ -298,12 +295,16 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
     file_content = data.xml_content
     xml_main_doc = XSDTree.fromstring(file_content)
     # Transform all the result value into a string to help while testing equality of values with the original XML
-    for key in dict_tags_values_main_doc:
-        value = dict_tags_values_main_doc[key]
-        try:
-            dict_tags_values_main_doc[key] = str(value)
-        except:
-            dict_tags_values_main_doc[key] = u''.join(value).encode('utf-8')
+    for key, value in dict_tags_values_main_doc.items():
+        if isinstance(value, list):
+            dict_tags_values_main_doc[key] = map(lambda x: x if isinstance(x, unicode) else str(x), value)
+        else:
+            try:
+                dict_tags_values_main_doc[key] = str(value)
+            except:
+                dict_tags_values_main_doc[key] = u''.join(value).encode('utf-8')
+        v = dict_tags_values_main_doc[key]
+
     # Process the XML structure that represents the main document to keep only the needed tags and information
     for child in xml_main_doc.iter():
         # Transform all values into a string
@@ -316,12 +317,19 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
         # else we remove the text
         if child.tag in dict_tags_values_main_doc.keys():
             # Fixme  # if text != str(dict_tags_values_main_doc[child.tag]) or dict_tags_values_main_doc[child.tag] not in text: (caution: does not keep all needed values if we replace by this line)
-            if text == str(dict_tags_values_main_doc[child.tag]):
-                pass
-            elif dict_tags_values_main_doc[child.tag] in text:
-                pass
+            if isinstance(dict_tags_values_main_doc[child.tag],list):
+                display_value = False
+                for value in dict_tags_values_main_doc[child.tag]:
+                    if value == text or value in text:
+                        display_value = True
+                        break
+                if not display_value:
+                    child.text = ""
             else:
-                child.text = ""
+                if text == str(dict_tags_values_main_doc[child.tag]) or dict_tags_values_main_doc[child.tag] in text:
+                    pass
+                else:
+                    child.text = ""
         else:
             # If text is in our list of items of the main doc we keep the value and remove it from our list of items
             if text in list_values_of_items_from_main_doc:
@@ -335,7 +343,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                     if v in text:
                         display_text = True
                         break
-                if not display_text:#==False:
+                if not display_text:
                     child.text = ""
 
     xml_f_main_doc = xml_main_doc
@@ -349,9 +357,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
     xml_final = "<xml>\n" + xml + "</xml>"
     xml_final = u''.join(xml_final).encode('utf-8')
     xml_final = str(xml_final)
-    print dict_tags_values_main_doc
     view_data["download"] = xml_final
-
     return view_data
 
 

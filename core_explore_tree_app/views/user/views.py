@@ -85,7 +85,10 @@ def core_explore_tree_index(request):
         "css": ['core_explore_tree_app/user/css/tree.css']
     }
 
+    modals = ['core_explore_tree_app/user/navigation/download_options.html']
+
     return render(request,
                   'core_explore_tree_app/user/navigation/explore_tree_wrapper.html',
                   assets=assets,
+                  modals=modals,
                   context=context)

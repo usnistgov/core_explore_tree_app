@@ -1,0 +1,21 @@
+{% extends 'core_main_app/_render/admin/theme/tools/modal.html' %}
+{% load staticfiles %}
+{% block modal_id %}select-download-options-modal{% endblock %}
+{% block modal_title %}Download options{% endblock %}
+
+{% block modal_body %}
+<div class="alert alert-danger" id="banner_errors" style="display: none;">
+        <a href="#" class="close" data-hide="alert" aria-label="close">&times;</a>
+     	<h4><i class="fa fa-exclamation-circle"></i> Error</h4>
+        <div id="form_download_errors">
+</div>
+</div>
+<div class="pop_download_instruction">Please choose one of the following options to download data:</div>
+<p></p>
+<input type="button" name="download_data" value="Download the source file" onclick="download_source_file();">
+<input type="button" name="download_data" value="Download the displayed data" onclick="download_displayed_data();">
+{% endblock %}
+
+{% block modal_footer %}
+<a class="btn btn-default pull-left" data-dismiss="modal" href="#"><i class="fa fa-times"></i> Cancel</a>
+{% endblock %}
