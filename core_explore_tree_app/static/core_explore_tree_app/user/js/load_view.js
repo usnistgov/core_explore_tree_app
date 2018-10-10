@@ -1,7 +1,7 @@
 /**
 * Js file dedicated to display and load tree and data
 */
-var filename = "";
+var filesNames = [];
 var text = "";
 var current_node;
 var xml_doc_id;
@@ -71,6 +71,7 @@ download_xml_tree = function(){
 */
 download_source_file = function(){
   showLoadingSpinner();
+  filename = filesNames[0];
   $.get({
       url: "download_source_file",
       method: "GET",
@@ -98,6 +99,7 @@ download_source_file = function(){
 */
 download_displayed_data = function(event){
   showLoadingSpinner();
+  filename = filesNames[1];
   $.get({
       url: "download_displayed_data",
       method: "GET",
@@ -133,6 +135,8 @@ var displayLeafView = function(event) {
     var documentId = nodeClasses[1];
     var nodeId = nodeClasses[2];
     var navigationId = $('.navigation_id').html();
+    filename_displayed_data = this.childNodes[0].nodeValue;
+
     $(this).parents("span:first").addClass("highlight");
 
     xml_doc_id = documentId;
@@ -149,9 +153,10 @@ var displayLeafView = function(event) {
         success: function(data) {
             hideLoadingSpinner();
             showDataPanel(data);
-            // set the filename to the current name in case the user wants to download it
-            filename = data.substring(32,data.indexOf("<",32)) // remove the tag <h1 class="section-full-header">
-            // retrieve the data in case the user wants to download the displaying data
+            // set the filename in case the user wants to download it
+            filename_source_file = data.substring(32,data.indexOf("<",32)); // remove the tag <h1 class="section-full-header">
+            // retrieve the data in case the user wants to download the data
+            filesNames = [filename_source_file,filename_displayed_data];
             text = data
             current_node = nodeId
             showHighlight(xml_doc_id);
@@ -199,6 +204,7 @@ var displayLinkView = function(event) {
     var documentId = nodeClasses[2];
     var navigationId = $('.navigation_id').html();
     xml_doc_id = documentId;
+    filename_displayed_data = this.childNodes[0].nodeValue;
 
     showLoadingSpinner();
 
@@ -214,7 +220,8 @@ var displayLinkView = function(event) {
             showDataPanel(data);
             var f = JSON.stringify(data)//String(data)
             // set the filename to the current name in case the user wants to download it
-            filename = f.substring(35,f.indexOf("<",24))
+            filename_source_file = data.substring(32,data.indexOf("<",32));
+            filesNames = [filename_source_file,filename_displayed_data];
             text = JSON.stringify(data)
             current_node = nodeId
             showHighlight(xml_doc_id);
