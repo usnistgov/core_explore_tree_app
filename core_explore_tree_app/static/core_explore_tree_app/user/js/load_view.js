@@ -49,14 +49,14 @@ var showHighlight = function() {
 /**
 * Shows a dialog to choose dialog options
 */
-downloadOptions_file = function(){
+var downloadOptions_file = function(){
   $("#select-download-options-modal").modal("show");
 }
 
 /**
 * Download the displaying data into an XML document
 */
-download_xml_tree = function(){
+var download_xml_tree = function(){
   //create the file to write
   var link = document.createElement('a');
   // set the file with the displaying data
@@ -69,11 +69,11 @@ download_xml_tree = function(){
 /**
 * Download the displaying data into an XML document
 */
-download_source_file = function(){
+var download_source_file = function(){
   showLoadingSpinner();
   filename = filesNames[0];
   $.get({
-      url: "download_source_file",
+      url: download_source_file_url,
       method: "GET",
       data: {
           file_name: filename,
@@ -97,11 +97,11 @@ download_source_file = function(){
 /**
 * Download the displayed data into an XML document
 */
-download_displayed_data = function(event){
+var download_displayed_data = function(event){
   showLoadingSpinner();
   filename = filesNames[1];
   $.get({
-      url: "download_displayed_data",
+      url: download_displayed_data_url,
       method: "GET",
       data: {
           file_name: filename,

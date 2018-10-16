@@ -14,5 +14,5 @@ urlpatterns = [
     url(r'^download_source_file/$', user_ajax.download_source_file,
         name='core_explore_tree_app_download_source_file'),
     url(r'^download_displayed_data/$', user_ajax.download_displayed_data,
-        name='core_download_displayed_data'),
+        name='core_explore_tree_app_download_displayed_data'),
 ]
