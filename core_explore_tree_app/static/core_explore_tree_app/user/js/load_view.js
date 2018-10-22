@@ -63,7 +63,9 @@ var download_source_file = function(){
         $("#select-download-options-modal").modal("hide");
       },
       error: function() {
-        console.error("An error occurred while downloading the xml document");
+        errors="An error occured while downloading the data";
+        $("#form_download_errors").html(errors);
+        $("#banner_errors").show(500)
       }
     })
 }
@@ -73,7 +75,7 @@ var download_source_file = function(){
 */
 var download_displayed_data = function(event){
   showLoadingSpinner();
-  filename = filesNames[1];
+  filename = (filesNames[1]).replace(".","_");
   $.get({
       url: download_displayed_data_url,
       method: "GET",
@@ -86,14 +88,15 @@ var download_displayed_data = function(event){
         hideLoadingSpinner();
         var link = document.createElement('a');
         var parser = new XMLSerializer().serializeToString(data.documentElement);
-
         link.setAttribute('href','data:text/xml;charset=utf-8,' + parser);
         link.setAttribute('download', filename);
         link.click();
         $("#select-download-options-modal").modal("hide");
       },
       error: function() {
-       console.error("An error occurred while downloading the displayed data");
+        errors="An error occured while downloading the data";
+        $("#form_download_errors").html(errors);
+        $("#banner_errors").show(500)
       }
     })
 }
