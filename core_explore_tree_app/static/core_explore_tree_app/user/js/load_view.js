@@ -6,32 +6,6 @@ var text = "";
 var current_node;
 var xml_doc_id;
 
-$('#explorer-panel-transparent-bgd').css({
-                  'position':'fixed',
-                  'top':'0px',
-                  'left':'0px',
-                  'width':'100%',
-                  'height':'100%',
-                  'display':'block',
-                  'background-color':'#000',
-                  'z-index':'2147483645',
-                  'opacity': '0.8',
-                  'filter':'alpha(opacity=80)',
-                  'display':'none'
-            });
-
-$('#explore-panel-loading').css({
-                  'position':'fixed',
-                  'top':'50%',
-                  'left':'45%',
-                  'display':'block',
-                  'background-color':'#000',
-                  'color':'#337ab7',
-                  'z-index':'2147483647',
-                  'display':'none',
-                  'border-style':'solid',
-                  'border-color':'#337ab7'
-            });
 
 var removeHighlight = function() {
     var highlightClass = "highlight";

@@ -82,7 +82,8 @@ def core_explore_tree_index(request):
                 "is_raw": True
             },
         ],
-        "css": ['core_explore_tree_app/user/css/tree.css']
+        "css": ['core_explore_tree_app/user/css/tree.css',
+                'core_explore_tree_app/user/css/loading_background.css']
     }
 
     modals = ['core_explore_tree_app/user/navigation/download_options.html']
