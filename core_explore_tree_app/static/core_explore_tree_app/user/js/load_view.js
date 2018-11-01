@@ -65,7 +65,8 @@ var download_source_file = function(){
       error: function() {
         errors="An error occured while downloading the data";
         $("#form_download_errors").html(errors);
-        $("#banner_errors").show(500)
+        $("#banner_errors").show(500);
+        hideLoadingSpinner();
       }
     })
 }
@@ -96,7 +97,8 @@ var download_displayed_data = function(event){
       error: function() {
         errors="An error occured while downloading the data";
         $("#form_download_errors").html(errors);
-        $("#banner_errors").show(500)
+        $("#banner_errors").show(500);
+        hideLoadingSpinner();
       }
     })
 }
