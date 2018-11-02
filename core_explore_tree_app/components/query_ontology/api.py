@@ -13,7 +13,7 @@ def upsert(query_ontology):
     Returns:
 
     """
-    return query_ontology.save()
+    return query_ontology.save_object()
 
 
 def delete(ontology):

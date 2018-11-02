@@ -101,19 +101,21 @@ def upload_query_ontology(request):
 
         if form.is_valid():
             try:
+                # save the query ontology
                 _save_query_ontology(request, context)
+                # redirect to the list of query ontology
                 return HttpResponseRedirect(reverse("admin:core_explore_tree_app_query_ontology"))
+            except exceptions.NotUniqueError:
+                context['errors'] = html_escape("An Ontology with the same name already exists. "
+                                                "Please choose another name.")
             except Exception, e:
                 context['errors'] = html_escape(e.message)
-                return admin_render(request,
-                                    'core_explore_tree_app/admin/query_ontology/upload.html',
-                                    assets=assets,
-                                    context=context)
     # method is GET
     else:
-        # render the form to upload a template
+        # render the form to upload a query ontology
         context['upload_form'] = UploadQueryOntologyForm()
 
+    # render the upload page
     return admin_render(request,
                         'core_explore_tree_app/admin/query_ontology/upload.html',
                         assets=assets,
@@ -184,10 +186,5 @@ def _save_query_ontology(request, context):
     # read the content of the file
     # FIXME: this method should be renamed to read_file, can't be done in this commit
     owl_data = read_xsd_file(owl_file)
-    try:
-        owl = QueryOntology(title=name, content=owl_data, template=template_id)
-        query_ontology_api.upsert(owl)
-    except exceptions.NotUniqueError:
-        context['errors'] = html_escape("An Ontology with the same name already exists. Please choose another name.")
-    except Exception, e:
-        context['errors'] = html_escape(e.message)
+    owl = QueryOntology(title=name, content=owl_data, template=template_id)
+    query_ontology_api.upsert(owl)

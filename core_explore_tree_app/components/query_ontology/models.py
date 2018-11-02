@@ -12,7 +12,7 @@ from core_main_app.components.template.models import Template
 class QueryOntology(Document):
     """ Ontology of queries to generate the navigation tree
     """
-    title = fields.StringField(blank=False, regex=NOT_EMPTY_OR_WHITESPACES)
+    title = fields.StringField(unique=True, blank=False, regex=NOT_EMPTY_OR_WHITESPACES)
     status = fields.IntField(default=0, blank=False)  # 0: Uploaded; 1: Active; 2: Blank; -1: Deleted
     last_modification_date = fields.DateTimeField(blank=True)
     content = fields.StringField(blank=False)
@@ -68,5 +68,19 @@ class QueryOntology(Document):
             return QueryOntology.objects.get(pk=str(query_ontology_id))
         except mongoengine_errors.DoesNotExist as e:
             raise exceptions.DoesNotExist(e.message)
+        except Exception as ex:
+            raise exceptions.ModelError(ex.message)
+
+    def save_object(self):
+        """ Custom save.
+
+        Returns:
+            Saved Instance.
+
+        """
+        try:
+            return self.save()
+        except mongoengine_errors.NotUniqueError as e:
+            raise exceptions.NotUniqueError(e.message)
         except Exception as ex:
             raise exceptions.ModelError(ex.message)
