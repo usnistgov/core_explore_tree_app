@@ -1,28 +1,30 @@
 import json
 
-from core_explore_tree_app.components.data import api as data_explore_tree_api
+from core_main_app.system import api as system_api
 from core_explore_tree_app.utils.xml.projection import get_projection
-from core_main_app.components.data.models import Data
+from core_main_app.commons.exceptions import ApiError
 
 
 def _is_advanced_filter(str_filter):
     """ Helper able to determine if a filter is advanced or not
 
     Args:
-         str_filter
+         str_filter:
+
     Return:
     """
     try:
         json_filter = json.loads(str_filter)
-
         expected_keys = {"documents", "query"}
+
         return len(expected_keys.difference(json_filter.keys())) == 0
-    except Exception as exc:
+    except ValueError:  # Only error that json.loads can raise
         return False
 
 
-def execute_query(template_id, filters=list(), projection=None):
-    """
+def execute_query(template_id, filters=None, projection=None):
+    """ Execute a query given a template, filters and the projection
+
     Args:
         template_id:
         filters:
@@ -30,11 +32,15 @@ def execute_query(template_id, filters=list(), projection=None):
 
     Return:
     """
+    # Set default value for filters
+    if filters is None:
+        filters = list()
+
     # Will be returned at the end
     data_list_result = []
 
     # Get all data from the given template
-    data_id_list = {data.id for data in data_explore_tree_api.get_all_by_list_template([template_id])}
+    data_id_list = {data.id for data in system_api.get_all_by_list_template([template_id])}
 
     # Parsing filters if present
     for _filter in filters:
@@ -46,10 +52,9 @@ def execute_query(template_id, filters=list(), projection=None):
             json_filter = json.loads(_filter)
             json_projection = json.loads(projection)
         except Exception, e:
-            print e.message
+            raise ApiError("Query parsing failed (%s)" % e.message)
 
         if _is_advanced_filter(_filter):
-            json_filter = json.loads(_filter)
             # Get matching document
             #   list possible values of the right hand side
             #   match resulted documents
@@ -63,9 +68,9 @@ def execute_query(template_id, filters=list(), projection=None):
 
             for doc in matching_documents:
                 doc_cross_query = {json_filter["documents"].values()[0]: get_projection(doc)}
-                filter_result += Data.execute_query(doc_cross_query).only(json_projection.keys()[0])
+                filter_result += system_api.execute_query_with_projection(doc_cross_query, json_projection.keys()[0])
         else:
-            filter_result = Data.execute_query(json_filter).only(json_projection.keys()[0])
+            filter_result = system_api.execute_query_with_projection(json_filter, json_projection.keys()[0])
 
         filter_id = {document.id for document in filter_result}
         data_id_list = data_id_list.intersection(filter_id)
@@ -83,7 +88,7 @@ def get_filter_values(field):
     Return:
     """
     query = {field: {"$exists": True}}
-    documents = Data.execute_query(query).only(field)
+    documents = system_api.execute_query_with_projection(query, field)
     return {get_projection(doc) for doc in documents}
 
 
@@ -110,5 +115,3 @@ def get_matching_document(template_id, field, values, query):
         document_set += execute_query(template_id, tmp_query, json.dumps(document_projection))
 
     return document_set
-
-
