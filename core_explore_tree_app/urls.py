@@ -1,7 +1,6 @@
 """ Url router for the Explore tree application
 """
-
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from core_explore_tree_app.views.user import ajax as user_ajax
 from core_explore_tree_app.views.user import views as user_views
@@ -15,4 +14,5 @@ urlpatterns = [
         name='core_explore_tree_app_download_source_file'),
     url(r'^download_displayed_data/$', user_ajax.download_displayed_data,
         name='core_explore_tree_app_download_displayed_data'),
+    url(r'^rest/', include('core_explore_tree_app.rest.urls')),
 ]
