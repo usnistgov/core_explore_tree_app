@@ -24,6 +24,7 @@ var showHighlight = function() {
 * Shows a dialog to choose dialog options
 */
 var downloadOptions_file = function(){
+  $("#banner_errors").hide();
   $("#select-download-options-modal").modal("show");
 }
 
@@ -63,7 +64,7 @@ var download_source_file = function(){
         $("#select-download-options-modal").modal("hide");
       },
       error: function() {
-        errors="An error occured while downloading the data";
+        errors="An error occurred while downloading the data";
         $("#form_download_errors").html(errors);
         $("#banner_errors").show(500);
         hideLoadingSpinner();
@@ -95,7 +96,7 @@ var download_displayed_data = function(event){
         $("#select-download-options-modal").modal("hide");
       },
       error: function() {
-        errors="An error occured while downloading the data";
+        errors="An error occurred while downloading the data";
         $("#form_download_errors").html(errors);
         $("#banner_errors").show(500);
         hideLoadingSpinner();
