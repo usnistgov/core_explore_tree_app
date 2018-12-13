@@ -1,6 +1,5 @@
 """ REST views for the Query Ontology API
 """
-
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from rest_framework import status
@@ -18,17 +17,22 @@ from core_main_app.utils.file import get_file_http_response
 
 
 class QueryOntologyList(APIView):
-    """ List all Query Ontology, or create a new one.
+    """ List all Query Ontology, or create a new one
     """
     def get(self, request):
-        """ Get all Query Ontology.
+        """ Get all Query Ontology
 
-        Args:
-            request:
+            Args:
 
-        Returns:
+                request: HTTP request
 
-        """
+            Returns:
+
+                - code: 200
+                  content: List of Query Ontology
+                - code: 500
+                  content: Internal server error
+            """
         try:
             # Get object
             query_ontology_list = query_ontology_api.get_all()
@@ -44,13 +48,30 @@ class QueryOntologyList(APIView):
 
     @method_decorator(api_staff_member_required())
     def post(self, request):
-        """ Create Query Ontology
+        """ Create a Query Ontology
+
+        Parameters:
+
+            {
+                "title": "title",
+                "content": "owl_content",
+                "template": "template_id"
+            }
 
         Args:
-            request:
+
+            request: HTTP request
 
         Returns:
 
+            - code: 201
+              content: Created Query Ontology
+            - code: 400
+              content: Validation error
+            - code: 404
+              content: Template was not found
+            - code: 500
+              content: Internal server error
         """
         try:
             # Build serializer
@@ -69,24 +90,26 @@ class QueryOntologyList(APIView):
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         except exceptions.DoesNotExist:
             content = {'message': 'Query Ontology not found.'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
         except Exception as api_exception:
             content = {'message': api_exception.message}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class QueryOntologyDownload(APIView):
-    """ Download content from Query Ontology.
+    """ Download content from Query Ontology
     """
     def get_object(self, request, pk):
         """ Get Query ontology from db
 
         Args:
-            request:
-            pk:
+
+            request: HTTP request
+            pk: ObjectId
 
         Returns:
 
+            Query ontology
         """
         try:
             return query_ontology_api.get_by_id(pk)
@@ -98,11 +121,18 @@ class QueryOntologyDownload(APIView):
         """ Download Query Ontology
 
         Args:
-            request:
-            pk:
+
+            request: HTTP request
+            pk: ObjectId
 
         Returns:
 
+            - code: 200
+              content: OWL file
+            - code: 404
+              content: Object was not found
+            - code: 500
+              content: Internal server error
         """
         try:
             # Get object
@@ -125,11 +155,13 @@ class QueryOntologyActivate(APIView):
         """ Get Query ontology from db
 
         Args:
-            request:
-            pk:
+
+            request: HTTP request
+            pk: ObjectId
 
         Returns:
 
+            Query ontology
         """
         try:
             return query_ontology_api.get_by_id(pk)
@@ -141,11 +173,20 @@ class QueryOntologyActivate(APIView):
         """ Activate the given Query Ontology
 
         Args:
-            request:
-            pk:
+
+            request: HTTP request
+            pk: ObjectId
 
         Returns:
 
+            - code: 200
+              content: {}
+            - code: 403
+              content: Access control error
+            - code: 404
+              content: Object was not found
+            - code: 500
+              content: Internal server error
         """
         try:
             # Get object
@@ -153,12 +194,12 @@ class QueryOntologyActivate(APIView):
             # Activate the given Query Ontology
             query_ontology_api.edit_status(query_ontology_object, QueryOntologyStatus.active.value)
             return Response({}, status=status.HTTP_200_OK)
-        except Http404:
-            content = {'message': 'Query Ontology not found.'}
-            return Response(content, status=status.HTTP_404_NOT_FOUND)
         except AccessControlError as ace:
             content = {'message': ace.message}
             return Response(content, status=status.HTTP_403_FORBIDDEN)
+        except Http404:
+            content = {'message': 'Query Ontology not found.'}
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
         except Exception as api_exception:
             content = {'message': api_exception.message}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
