@@ -1,0 +1,20 @@
+{% extends "core_main_app/_render/admin/theme/tools/section.html" %}
+{% load staticfiles %}
+
+{% block section_title %}{{ data.object_name }} Manager{% endblock %}
+
+{% block section_content %}
+    {% if data.object_name == "Manual Cache" %}
+        <div class="row">
+            <div class="col-md-12">
+                {% block list_includes %}
+                    {% include 'core_explore_tree_app/admin/cache/tree_wrapper.html' %}
+                {% endblock %}
+            </div>
+        </div>
+    {% endif %}
+<!-- spinner for initial load -->
+<div id="loading_background" style="visibility: hidden;">
+{% include "core_explore_tree_app/user/navigation/loading_background.html" %}
+</div>
+{% endblock %}

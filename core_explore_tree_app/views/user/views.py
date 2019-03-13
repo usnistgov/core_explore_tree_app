@@ -1,11 +1,6 @@
 """Explore tree app user views
 """
-import json
-
 from django.core.cache import caches
-from django.http.response import HttpResponse, HttpResponseBadRequest
-from django.views.decorators.cache import cache_page
-from rest_framework.status import HTTP_404_NOT_FOUND, HTTP_405_METHOD_NOT_ALLOWED
 
 import core_explore_tree_app.components.query_ontology.api as query_ontology_api
 from core_explore_tree_app.components.navigation.api import create_navigation_tree_from_owl_file
@@ -28,7 +23,6 @@ def core_explore_tree_index(request):
     """
     context = {}
     error = None
-
     try:
         # get the active ontology
         active_ontology = query_ontology_api.get_active()
@@ -87,7 +81,6 @@ def core_explore_tree_index(request):
     }
 
     modals = ['core_explore_tree_app/user/navigation/download_options.html']
-
     return render(request,
                   'core_explore_tree_app/user/navigation/explore_tree_wrapper.html',
                   assets=assets,

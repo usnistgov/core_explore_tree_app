@@ -24,7 +24,7 @@ var showHighlight = function() {
 * Shows a dialog to choose dialog options
 */
 var downloadOptions_file = function(){
-  $("#banner_errors").hide();
+  $("banner_errors").hide();
   $("#select-download-options-modal").modal("show");
 }
 
@@ -42,9 +42,10 @@ var download_xml_tree = function(){
 }
 
 /**
-* Download the displaying data into an XML document
+* Download the initial source file into an XML document
 */
 var download_source_file = function(){
+  $("banner_errors").hide();
   showLoadingSpinner();
   filename = filesNames[0];
   $.get({
@@ -64,7 +65,7 @@ var download_source_file = function(){
         $("#select-download-options-modal").modal("hide");
       },
       error: function() {
-        errors="An error occurred while downloading the data";
+        errors="An error occured while downloading the data";
         $("#form_download_errors").html(errors);
         $("#banner_errors").show(500);
         hideLoadingSpinner();
@@ -76,6 +77,7 @@ var download_source_file = function(){
 * Download the displayed data into an XML document
 */
 var download_displayed_data = function(event){
+  $("banner_errors").hide();
   showLoadingSpinner();
   filename = (filesNames[1]).replace(".","_");
   $.get({
@@ -96,7 +98,7 @@ var download_displayed_data = function(event){
         $("#select-download-options-modal").modal("hide");
       },
       error: function() {
-        errors="An error occurred while downloading the data";
+        errors="An error occured while downloading the data";
         $("#form_download_errors").html(errors);
         $("#banner_errors").show(500);
         hideLoadingSpinner();
@@ -178,14 +180,12 @@ var displayBranchView = function(event) {
 var displayLinkView = function(event) {
     event.preventDefault();
     removeHighlight();
-
     var nodeClasses = $(this).attr("class").split(" ");
     var nodeId = nodeClasses[1];
     var documentId = nodeClasses[2];
     var navigationId = $('.navigation_id').html();
     xml_doc_id = documentId;
     filename_displayed_data = this.childNodes[0].nodeValue;
-
     showLoadingSpinner();
 
     $.ajax({
@@ -216,8 +216,16 @@ var showDataPanel = function(data) {
     hideLoadingSpinner();
     // hide the error panel
     $("#explore-view-error").hide();
+    // Make the http link clickable
+    var http_index = data.indexOf("http");
+    var sub_str= data.substr(http_index);
+    var index = sub_str.indexOf("<");
+    var link = data.substring(http_index,http_index+index);
+
+    var html_link = "<a href="+"\'"+link+"\' target=\'_blank\'>"+link+"</a>";
+    var final_data = data.replace(link, html_link);
     // show the data
-    $("#explore-view").html(data);
+    $("#explore-view").html(final_data);//data);
     $("#explore-view").show();
     // enable the download button
     $("#explore-view-download").prop('disabled', false);

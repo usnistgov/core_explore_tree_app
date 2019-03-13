@@ -7,6 +7,5 @@ if not settings.configured:
     settings.configure()
 
 BASE_DIR_EXPLORE_TREE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# MENU
 
-EXPLORE_TREE_MENU_NAME = getattr(settings, 'EXPLORE_TREE_MENU_NAME', 'Explore tree')
+EXPLORE_TREE_MENU_NAME = getattr(settings, 'EXPLORE_TREE_MENU_NAME', 'Explore Tree')

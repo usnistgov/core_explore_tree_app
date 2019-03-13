@@ -3,6 +3,9 @@
 from core_explore_tree_app.components.navigation.models import Navigation
 from core_explore_tree_app.parser.parser import parse_ontology
 
+from core_cache_manager_app.components.data_cached import api as data_cached_api
+from core_explore_tree_app.components.leaf import api as leaf_api
+
 
 def get_by_id(navigation_id):
     """ Return Navigation object with the given id.
@@ -49,6 +52,9 @@ def create_navigation_tree_from_owl_file(owl_content):
     Returns: Navigation object
 
     """
+    clean_navigation_objects()
+    data_cached_api.clean_datacached_objects()
+    leaf_api.clean_leaves_objects()
     parsed_ontology = parse_ontology(owl_content)
     return _create_navigation(parsed_ontology)
 
@@ -64,7 +70,6 @@ def _create_navigation(tree):
     # create navigation
     navigation = Navigation()
     upsert(navigation)
-
     # generate children
     children = _create_navigation_branches(tree, str(navigation.id))
 
@@ -105,3 +110,14 @@ def _create_navigation_branches(tree, parent):
         children_ids.append(str(navigation.id))
 
     return children_ids
+
+
+def clean_navigation_objects():
+    """ Delete all Navigation objects from the Database
+
+        Args:
+
+        Returns:
+
+        """
+    return Navigation.delete_objects()

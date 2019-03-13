@@ -1,0 +1,19 @@
+{% load staticfiles %}
+
+{% block box_tools %}
+
+{% endblock %}
+
+{% block box_body %}
+{% if data.error %}
+    <div class="alert alert-danger">
+      {{data.error}}
+    </div>
+{% else %}
+    Number of documents in the cache: {{data.number_cached_docs}}
+    <div></div>
+    <div></div>
+    <div id="explore-view-error" style="margin-top: 50px; display: none;">
+    </div>
+{% endif %}
+{% endblock %}

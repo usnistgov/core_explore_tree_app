@@ -1,0 +1,30 @@
+{% extends 'core_main_app/_render/admin/theme/tools/modal.html' %}
+{% load staticfiles %}
+{% block modal_id %}clear-cache-modal{% endblock %}
+{% block modal_title %}Clear Cache options{% endblock %}
+
+
+{% block modal_body %}
+<div class="alert alert-danger" id="clear_cache_banner_errors" style="display: none;">
+        <a href="#" class="close" data-hide="alert" aria-label="close">&times;</a>
+     	<h4><i class="fa fa-exclamation-circle"></i> Error</h4>
+        <div id="clear_cache_text_error"></div>
+</div>
+<div class="alert alert-success" id="clear_cache_banner_success" style="display: none;">
+        <a href="#" class="close" data-hide="alert" aria-label="close">&times;</a>
+     	<h4><i class="fa fa-exclamation-circle"></i> Success</h4>
+        <div id="clear_cache_text_success"></div>
+</div>
+<div class="pop_clear_cache_instruction">
+    <p class="alert alert-warning">
+        Are you sure you want to clear all cached data ? (It will delete the navigation tree and all cached files from the tree) <br/>
+    </p>
+</div>
+{% endblock %}
+
+{% block modal_footer %}
+
+<a class="btn btn-default pull-left" data-dismiss="modal" href="#"><i class="fa fa-times"></i> Cancel</a>
+<button id="btn-display-clear-data" class="btn btn-default" >Clear the cache</button>
+
+{% endblock %}

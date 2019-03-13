@@ -1,0 +1,10 @@
+{% load staticfiles %}
+
+{% block box_tools %}
+{% endblock %}
+{% block box_title %}
+    Manual cache.
+{% endblock %}
+
+
+{% include 'core_explore_tree_app/admin/cache/content.html' with navigation_tree=data.navigation_tree %}

@@ -19,6 +19,8 @@ from core_explore_tree_app.utils.xml.projection import get_projection
 from core_main_app.components.data.models import Data
 from core_main_app.utils.file import get_file_http_response
 from xml_utils.xsd_tree.xsd_tree import XSDTree
+from core_cache_manager_app.components.data_cached.models import DataCached
+from core_cache_manager_app.components.data_cached import api as data_cached_api
 
 leaf_cache = caches['leaf']
 branch_cache = caches['branch']
@@ -39,24 +41,52 @@ def load_view(request):
     if "nav_id" not in request.POST:
         error = {"message": "Request is malformed. nav_id is mandatory"}
         return HttpResponse(json.dumps(error), status=HTTP_400_BAD_REQUEST)
-
     # retrieve all the parameters from the request
     nav_id = request.POST.get('nav_id', None)
     node_id = request.POST.get('node_id', None)
     doc_id = request.POST.get('doc_id', None)
     ref_node_id = request.POST.get('ref_node_id', None)
-
+    load_doc = None
+    # Get all DataCached objects:
+    alldatacached = DataCached.get_all()
+    # create dict of keys values for the cache
+    listof = {}
+    for datacached in alldatacached:
+        dict_keys_docids = datacached.cached_documents_dict
+        for dict_key_docid in dict_keys_docids:
+            listof.update(dict_key_docid)
     # click on a document in the tree
     if node_id is not None and doc_id is not None:
         node_name = get_node_name(node_id)
-        c_id = str(node_name) + '_' + str(doc_id)
+        id_docleaf_cached = str(node_name) + '_' + str(doc_id)
         # Get the document from the cache if this one had ever been accessed
-        if c_id in leaf_cache:
-            load_doc = leaf_cache.get(c_id)
+        for key, value in listof.items():
+            if id_docleaf_cached == key:
+                # from leaf cache
+                load_doc = leaf_cache.get(key)
+                if load_doc:
+                    break
+                else:
+                    if id_docleaf_cached == value:
+                        # from link cache
+                        load_doc = link_cache.get(key)
+                        leaf_cache.set(id_docleaf_cached, load_doc)
+                        break
+            elif id_docleaf_cached == value:
+                # from link cache
+                load_doc = link_cache.get(key)
+                leaf_cache.set(id_docleaf_cached, load_doc)
+                break
+        if not load_doc:
         # Else :Query the database, process the documents
-        else:
             load_doc = _load_data_view(node_id, nav_id, doc_id)
-            leaf_cache.set(c_id, load_doc)
+            leaf_cache.set(id_docleaf_cached, load_doc)
+            doc = Data.get_by_id(doc_id)
+            # create or update the Datacached model representing a Node and its cached files
+            dict_key_docid = {}
+            dict_key_docid[id_docleaf_cached] = id_docleaf_cached
+            data_cached_api.upsert_data_cache_object(node_name, doc, dict_key_docid)
+
 
     # click on a node in the tree
     elif node_id is not None:
@@ -68,18 +98,38 @@ def load_view(request):
 
     # click on a link in a document (build id)
     elif ref_node_id is not None and doc_id is not None:
-        c_id = ref_node_id + '_' + doc_id
-        if c_id in link_cache:
-            load_doc = link_cache.get(c_id)
+        navigation_node = None
+        id_doclink_cached = ref_node_id + '_' + doc_id
+        # The file was cached by clicking a link from a document
+        if id_doclink_cached in listof.keys() or id_doclink_cached in link_cache:
+            load_doc = link_cache.get(id_doclink_cached)
         else:
-            load_doc = _load_data_view(ref_node_id, nav_id, doc_id, False)
-            link_cache.set(c_id, load_doc)
+            navigation_node = navigation_operations.get_navigation_node_for_document(ref_node_id, doc_id)
+            nodename = navigation_node.name
+            nodename_index = nodename.find("#")
+            node_name = nodename[nodename_index + 1:]
+            id_doc_cached = node_name + "_" + str(doc_id)
+            # The file was cached by using the cache manager tool
+            if id_doc_cached in listof.keys():
+                load_doc = leaf_cache.get(id_doc_cached)
+                link_cache.set(id_doclink_cached, load_doc)
+        if not load_doc:
+                # The file was never cached
+                if not navigation_node:
+                    navigation_node = navigation_operations.get_navigation_node_for_document(ref_node_id, doc_id)
+                load_doc = _load_data_view(navigation_node.id, nav_id, doc_id)
+                link_cache.set(id_doclink_cached, load_doc)
+
+                doc = Data.get_by_id(doc_id)
+                dict_key_docid = {}
+                dict_key_docid[id_doclink_cached] = id_doc_cached
+                # create or update the DataCached model representing a Node and its cached files
+                data_cached_api.upsert_data_cache_object(node_name, doc, dict_key_docid)
 
     else:
         error = {"message": "Request is malformed."}
         return HttpResponse(json.dumps(error), status=HTTP_400_BAD_REQUEST)
 
-    # return the loaded data
     if load_doc is not None:
         return render(request, "core_explore_tree_app/user/explore_tree/view.html", load_doc)
 
@@ -192,6 +242,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                                                                          projection_view["data"])
             # Get all the queried documents (without the main queried document)
             queried_docs = parser_processview.ids_docs_to_querys
+
             for id_doc in queried_docs:
                 other_doc_query = {
                     "_id": ObjectId(id_doc)
@@ -200,7 +251,6 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                 query_list = list()
                 # list of queries results done on the current document
                 result_list = list()
-
                 for projection in doc_projections:
                     # Get the MongoDB query path for the parameter that need to be displayed
                     # eg: query_path = dict_content.a.b.c.d.e
@@ -358,7 +408,10 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
     xml_final = u''.join(xml_final).encode('utf-8')
     xml_final = str(xml_final)
     view_data["download"] = xml_final
-    return view_data
+    if from_tree:
+        return view_data
+    else:
+        return view_data, navigation_node
 
 
 def download_displayed_data(request):
@@ -377,16 +430,31 @@ def download_displayed_data(request):
     load_doc = {}
     if node_id is not None and doc_id is not None:
         node_name = get_node_name(node_id)
-        c_id_leaf = str(node_name) + '_' + str(doc_id)
-        c_id_link = node_id + '_' + doc_id
-
+        id_leafdoc = str(node_name) + '_' + str(doc_id)
+        id_linkdoc = node_id + '_' + doc_id
         # Get the document from the cache
-        # The doc had been reached initially from the tree
-        if c_id_leaf in leaf_cache:
-            load_doc = leaf_cache.get(c_id_leaf)
         # The doc had been reached initially from a link
-        elif c_id_link in link_cache:
-            load_doc = link_cache.get(c_id_link)
+        if id_linkdoc in link_cache:
+            load_doc = link_cache.get(id_linkdoc)
+        # The doc had been reached initially from the tree
+        elif id_leafdoc in leaf_cache:
+                load_doc = leaf_cache.get(id_leafdoc)
+        # The doc had been cached by the admin
+        else:
+            navigation_node = navigation_operations.get_navigation_node_for_document(node_id, doc_id)
+            nodename = navigation_node.name
+            nodename_index = nodename.find("#")
+            node_name = nodename[nodename_index + 1:]
+            id_doc_cached = node_name + "_" + str(doc_id)
+            listof = {}
+            alldatacached = DataCached.get_all()
+            for datacached in alldatacached:
+                dict_keys_docids = datacached.cached_documents_dict
+                for dict_key_docid in dict_keys_docids:
+                    listof.update(dict_key_docid)
+            if id_doc_cached in listof.keys():
+                load_doc = leaf_cache.get(str(listof[id_doc_cached]))
+
     return get_file_http_response(file_content=load_doc["download"],
                                   file_name=file_name,
                                   content_type="text/xml",

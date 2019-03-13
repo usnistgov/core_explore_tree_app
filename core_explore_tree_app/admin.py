@@ -26,6 +26,14 @@ admin_urls = [
         name='core_explore_tree_app_delete'),
     url(r'^query-ontology/$', admin_views.manage_query_ontology,
         name='core_explore_tree_app_query_ontology'),
+    url(r'^cache-manager-index/$', admin_views.core_cache_view_index,
+        name='core_cache_view_index'),
+    url(r'^cache-manager-view/$', admin_views.core_cache_manager_index,
+        name='core_cache_manager_index'),
+    url(r'^cache-manager-view/cache-all-files$', admin_ajax.core_cache_all_files,
+        name='cache-all-files'),
+    url(r'^cache-manager-view/clear-cache$', admin_ajax.core_clear_cache,
+        name='clear-cache'),
 ]
 
 urls = admin.site.get_urls()

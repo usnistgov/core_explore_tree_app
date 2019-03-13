@@ -68,3 +68,13 @@ class Navigation(Document):
 
         """
         return Navigation.objects(name=str(navigation_name)).all()
+
+    @staticmethod
+    def delete_objects():
+        """ Custom delete all Navigation objects.
+
+        Returns:
+            Delete all Instances.
+
+        """
+        return Navigation.objects().delete()

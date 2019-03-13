@@ -1,0 +1,46 @@
+{% extends 'core_main_app/_render/admin/theme/tools/modal.html' %}
+{% load staticfiles %}
+{% block modal_id %}cache-all-tree-files-modal{% endblock %}
+{% block modal_title %}Cache options{% endblock %}
+
+
+{% block modal_body %}
+<div class="alert alert-danger" id="banner_errors" style="display: none;">
+        <a href="#" class="close" data-hide="alert" aria-label="close">&times;</a>
+     	<h4><i class="fa fa-exclamation-circle"></i> Error</h4>
+        <div id="form_cache_errors"></div>
+</div>
+<div class="alert alert-success" id="banner_success" style="display: none;">
+        <a href="#" class="close" data-hide="alert" aria-label="close">&times;</a>
+     	<h4><i class="fa fa-exclamation-circle"></i> Success</h4>
+        <div id="form_cache_success"></div>
+</div>
+<div class = "form_caching">
+    <div class="pop_cache_instruction">Please choose one of the following options to cache the files :</div><br/>
+    <div id="form_start_caching" >
+        <form id="form_select_cached_files">
+            <input type="radio" name="cache_form" value="{{data.navigation_root_id}}"> <b class="pop_cache_label"> Cache all the files from the tree:</b>
+            <br /><br />
+            <input type="radio" name="cache_form" value="specific node"> <b class="pop_cache_label">Cache all the files from the following node: </b>
+            <br /><br />
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <form>
+                        {% csrf_token %}
+                        {{ data.form }}
+                    </form>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block modal_footer %}
+
+<a class="btn btn-default pull-left" data-dismiss="modal" href="#"><i class="fa fa-times"></i> Cancel</a>
+<button id="btn-display-data" class="btn btn-default">Start</button>
+
+{% endblock %}
+

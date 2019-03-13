@@ -1,0 +1,14 @@
+.pop_cache_label{
+	font-size: smaller;
+	font-weight: bold;
+}
+.pop_cache_instruction{
+	font-size: 0.8em;
+}
+.alert-success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+}
+.form_caching{
+    height: 11.5em;
+}

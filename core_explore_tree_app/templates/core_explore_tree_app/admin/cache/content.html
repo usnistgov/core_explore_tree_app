@@ -1,0 +1,50 @@
+{% extends 'core_main_app/_render/admin/theme/tools/box.html' %}
+{% load staticfiles %}
+
+{% block box_title %}
+    Current tree
+{% endblock %}
+
+{% block box_body %}
+{% if data.error %}
+    <div class="alert alert-danger">
+      {{data.error}}
+    </div>
+{% else %}
+    <!-- template-based caching -->
+    <div>
+        <a class="btn btn-default pull-right" style="margin-right: 10px;" onclick="clear_cache_options()">
+            Clear cache
+        </a>
+    </div>
+    <div></div>
+    <div>
+        <a class="btn btn-default pull-right" style="margin-right: 10px;" onclick="cache_all_tree_files()">
+            Cache all files from the tree
+        </a>
+    </div>
+    <table class="table table-bordered table-striped table-hover">
+
+        <div id="tree-panel" class="col-sm-4 col-md-3 sidebar">
+            <div id="tree">
+                <h4 id="tree-loading">
+                    <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                    <span>Loading tree...</span>
+                </h4>
+                <ul id="tree-details" class="hide">
+                    <li class="root"><i class="fa fa-database" ></i> Database</li>
+                    {{ data.navigation_tree | safe }}
+                </ul>
+            </div>
+            <div class="navigation_id" >{{ data.navigation_id }}</div>
+        </div>
+    </table>
+    <div id="explore-view-error" style="margin-top: 50px; display: none;">
+    </div>
+
+{% endif %}
+
+{% endblock %}
+{% block footer %}
+
+{% endblock %}

@@ -4,6 +4,7 @@ from core_explore_tree_app.components.navigation.api import get_by_id
 from core_explore_tree_app.components.data import query
 from core_explore_tree_app.settings import BASE_DIR_EXPLORE_TREE
 from core_explore_tree_app.utils.xml.projection import get_projection
+import core_explore_tree_app.components.leaf.api as leaf_api
 
 # FIXME: use template loader
 TEMPLATES_PATH = join(BASE_DIR_EXPLORE_TREE, 'core_explore_tree_app', 'templates',
@@ -91,7 +92,6 @@ def get_html_tree(navigation, template_id, tab, nav_table):
             doc_dict[t[0]] = t[1]
             dashtable.append(t[0])
     get_doc_by_nodes(navigation, doc_dict)
-
     for k,v in nav_table.iteritems():
         if "(" in v['branch_name']:
             pass
@@ -142,7 +142,8 @@ def render_documents(navigation, template_id, number_of_docs=0):
     """
     doc_tree_html = ""
     number_of_docs = 0
-
+    leaf_name = navigation.name
+    leaf_id = navigation.id
     try:
         # Get the navigation id
         navigation_id = str(navigation.id)
@@ -165,7 +166,6 @@ def render_documents(navigation, template_id, number_of_docs=0):
         # get the documents matching the query
 
         documents = query.execute_query(template_id, filters, projection)
-
         for document in documents:
             with open(join(TEMPLATES_PATH, 'li_document.html'), 'r') as li_file:
                 li_content = li_file.read()
@@ -179,6 +179,8 @@ def render_documents(navigation, template_id, number_of_docs=0):
 
                 doc_tree_html += li_template.render(Context(context))
                 number_of_docs += 1
+            leaf_api.upsert_leaf_object(str(leaf_id), str(document.id))
+
     except Exception, e:
         with open(join(TEMPLATES_PATH, 'li_error.html'), 'r') as li_file:
             li_content = li_file.read()
