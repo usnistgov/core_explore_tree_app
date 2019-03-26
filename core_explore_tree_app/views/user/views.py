@@ -1,5 +1,7 @@
 """Explore tree app user views
 """
+import logging
+
 from django.core.cache import caches
 
 import core_explore_tree_app.components.query_ontology.api as query_ontology_api
@@ -7,6 +9,8 @@ from core_explore_tree_app.components.navigation.api import create_navigation_tr
 from core_explore_tree_app.parser.renderer import render_navigation_tree
 from core_main_app.commons import exceptions
 from core_main_app.utils.rendering import render
+
+logger = logging.getLogger(__name__)
 
 navigation_cache = caches['navigation']
 html_tree_cache = caches['html_tree']
@@ -23,6 +27,7 @@ def core_explore_tree_index(request):
     """
     context = {}
     error = None
+
     try:
         # get the active ontology
         active_ontology = query_ontology_api.get_active()
@@ -51,8 +56,9 @@ def core_explore_tree_index(request):
         }
     except exceptions.DoesNotExist:
         error = {"error": "An Ontology should be active to explore. Please contact an admin."}
-    except Exception:
+    except Exception as e:
         error = {"error": "An error occurred during the generation of the navigation tree."}
+        logger.error('ERROR : {0}'.format(e.message))
 
     if error:
         context.update(error)

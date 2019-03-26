@@ -1,32 +1,34 @@
 """ Admin views
 """
+import logging
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.staticfiles import finders
+from django.core.cache import caches
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
 from django.utils.html import escape as html_escape
-from django.core.cache import caches
 
 import core_explore_tree_app.components.query_ontology.api as query_ontology_api
-from core_explore_tree_app.components.query_ontology.models import QueryOntology
-from core_explore_tree_app.components.navigation.models import Navigation
+from core_cache_manager_app.components.data_cached.models import DataCached
+from core_cache_manager_app.views.admin.forms import FormSelectDatabaseObject
 from core_explore_tree_app.commons.enums import QueryOntologyStatus
+from core_explore_tree_app.components.navigation.models import Navigation
+from core_explore_tree_app.components.query_ontology.models import QueryOntology
 from core_explore_tree_app.views.admin.ajax import EditOntologyView, DeleteObjectModalView
 from core_explore_tree_app.views.admin.forms import UploadQueryOntologyForm
-
 from core_main_app.commons import exceptions
 from core_main_app.utils.file import get_file_http_response
 from core_main_app.utils.rendering import admin_render
 from core_main_app.views.common.views import read_xsd_file
 
-from core_cache_manager_app.views.admin.forms import FormSelectDatabaseObject
-from core_cache_manager_app.components.data_cached.models import DataCached
+logger = logging.getLogger(__name__)
 
 html_tree_cache = caches['html_tree']
 navigation_cache = caches['navigation']
 leaf_cache = caches['leaf']
 link_cache = caches['link']
+
 
 @staff_member_required
 def manage_query_ontology(request):
@@ -212,9 +214,11 @@ def core_cache_view_index(request):
     """
     context = {'object_name': "Cache"}
     error = None
+
     try:
         # get the active ontology
         active_ontology = query_ontology_api.get_active()
+
         # get the navigation from the cache
         nav_key = active_ontology.id
         if nav_key in navigation_cache:
@@ -241,13 +245,14 @@ def core_cache_view_index(request):
                 context["nodes"] = cache_list
                 context["number_cached_docs"] = number_cached_docs
     except exceptions.DoesNotExist:
-        error = {"error": "An Ontology should be active to explore the cache. Please contact an admin."}
-    except Exception:
-        print "ERROR"
+        error = {"error": "An Ontology should be active to explore. Please contact an admin."}
+    except Exception as e:
         error = {"error": "An error occurred when displaying the cache status."}
+        logger.error('ERROR : {0}'.format(e.message))
 
     if error:
         context.update(error)
+
     assets = {}
     modals = []
     return admin_render(request,
@@ -269,7 +274,7 @@ def core_cache_manager_index(request):
     """
     context = {'object_name': "Manual Cache"}
     error = None
-    # Display the navigation tree
+
     try:
         # get the active ontology
         active_ontology = query_ontology_api.get_active()
@@ -289,11 +294,12 @@ def core_cache_manager_index(request):
         form = FormSelectDatabaseObject()
         form.set_objects(context["children"])
         context["form"] = form
-
     except exceptions.DoesNotExist:
-        error = {"error": "An Ontology should be active to explore the cache. Please contact an admin."}
-    except Exception:
-        error = {"error": "No navigation tree generated. Please go to the 'Data Exploration' menu to build the tree before using the cache."}
+        error = {"error": "An Ontology should be active to explore. Please contact an admin."}
+    except Exception as e:
+        error = {"error": "No navigation tree generated. "
+                          "Please go to the 'Data Exploration' menu to build the tree before using the cache."}
+        logger.error('ERROR : {0}'.format(e.message))
 
     if error:
         context.update(error)
