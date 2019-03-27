@@ -14,7 +14,6 @@ var cache_all_tree_files = function() {
  * Validate fields of the start caching
  */
 var cache_selected_files = function(){
-    console.log("cache_all_files");
     $("#banner_errors").hide();
 	$("#banner_success").hide();
     selected_option = $("#form_start_caching" ).find("input:radio[name='cache_form']:checked").val()
@@ -29,17 +28,15 @@ var cache_selected_files = function(){
 				showErrorPanel(errors);
 			}else{
 			     node_id = $("#id_nodes").val();
-			     console.log(node_id);
 			     $("#banner_errors").hide();
 			     cache_all_files_from_node(node_id);
 			}
 		}else {
 		    if ($( "#id_navigation_root" ).val() == ""){
 				errors = "You selected the option to cache all the files from the tree. Please click the button."
-			    console.log(errors);
+			    showErrorPanel(errors);
 			}else{
 			    root_node = selected_option
-			    console.log(selected_option);
 			    $("#banner_errors").hide();
 			    cache_all_files_from_node(root_node);
 			}
@@ -63,13 +60,11 @@ var cache_all_files_from_node =function(node_id){
             hideLoadingSpinner();
 		    $("#form_cache_success").html(data.message);
 		    $("#banner_success").show(500);
-
         },
         error: function(data) {
             hideLoadingSpinner();
             errors = "An error occurred when caching the files."
             showErrorPanel(errors);
-            console.log(errors);
         }
     })
 };
@@ -88,7 +83,6 @@ var clear_cache_options = function() {
  * Call ajax function that clear the cache
  */
 var clear_cache = function(){
-    console.log("clear cache");
     $("#banner_errors").hide();
 	$("#banner_success").hide();
     showLoadingSpinner();
@@ -99,8 +93,6 @@ var clear_cache = function(){
         success: function(data) {
             hideLoadingSpinner();
 		    $("#clear_cache_text_success").html(data.message);
-		    console.log("success");
-		    console.log(data.message);
 		    $("#clear_cache_banner_success").show(500);
 
         },
@@ -108,19 +100,17 @@ var clear_cache = function(){
             hideLoadingSpinner();
             errors = "An error occurred when deleting objects from the cache."
             $("#clear_cache_text_error").html(errors);
-            console.log(errors);
             $("#clear_cache_banner_errors").show(500);
         }
     })
 
 }
 
-var showErrorPanel = function(panel, errors) {
+var showErrorPanel = function(errors) {
     hideLoadingSpinner();
     $("#form_cache_errors").html(errors);
     $("#banner_errors").show(500);
 }
-
 var showLoadingSpinner = function() {
     document.getElementById("loading_background").style.visibility = "visible";
     $('#explorer-panel-transparent-bgd').show();
