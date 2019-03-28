@@ -278,28 +278,33 @@ def core_cache_manager_index(request):
     try:
         # get the active ontology
         active_ontology = query_ontology_api.get_active()
-        # get the navigation from the cache
-        nav_key = active_ontology.id
-        if nav_key in navigation_cache:
-            navigation = navigation_cache.get(nav_key)
-            context["navigation_root_id"] = navigation.id
-            # get the tree from the cache
-            tree_key = navigation.id
-            if tree_key in html_tree_cache:
-                html_tree = html_tree_cache.get(tree_key)
-                context["navigation_tree"] = html_tree
-            if navigation.children:
-                context["children"] = [Navigation.get_by_id(child) for child in navigation.children]
-        # Create the form to select which node to cache
-        form = FormSelectDatabaseObject()
-        form.set_objects(context["children"])
-        context["form"] = form
     except exceptions.DoesNotExist:
         error = {"error": "An Ontology should be active to explore. Please contact an admin."}
-    except Exception as e:
-        error = {"error": "No navigation tree generated. "
-                          "Please go to the 'Data Exploration' menu to build the tree before using the cache."}
-        logger.error('ERROR : {0}'.format(e.message))
+
+    if error is None:
+        try:
+            # get the navigation from the cache
+            nav_key = active_ontology.id
+            if nav_key in navigation_cache:
+                navigation = navigation_cache.get(nav_key)
+                context["navigation_root_id"] = navigation.id
+                # get the tree from the cache
+                tree_key = navigation.id
+                if tree_key in html_tree_cache:
+                    html_tree = html_tree_cache.get(tree_key)
+                    context["navigation_tree"] = html_tree
+                if navigation.children:
+                    context["children"] = [Navigation.get_by_id(child) for child in navigation.children]
+            # Create the form to select which node to cache
+            form = FormSelectDatabaseObject()
+            form.set_objects(context["children"])
+            context["form"] = form
+        except exceptions.DoesNotExist:
+            error = {"error": "Error when retrieve the navigation's children."}
+        except Exception as e:
+            error = {"error": "No navigation tree generated. "
+                              "Please go to the 'Data Exploration' menu to build the tree before using the cache."}
+            logger.error('ERROR : {0}'.format(e.message))
 
     if error:
         context.update(error)
