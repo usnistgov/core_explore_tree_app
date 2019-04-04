@@ -17,7 +17,7 @@ div#tree-panel {
 div#tree ul {
   list-style: none;
   line-height: 2em;
-  padding: 5px !important;
+  padding: 15px !important;
 }
 
 div#tree ul li {

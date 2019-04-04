@@ -52,7 +52,8 @@ def render_navigation(navigation, template_id, tab, nav_table):
                 context = {
                     'branch_id': navigation_id,
                     'branches': _branch,
-                    'branch_name': name + " ("+str(number_of_doc)+")"
+                    'branch_name': name,
+                    'branch_docs_nb': str(number_of_doc),
                 }
             else:
                 context = {
@@ -92,12 +93,21 @@ def get_html_tree(navigation, template_id, tab, nav_table):
             doc_dict[t[0]] = t[1]
             dashtable.append(t[0])
     get_doc_by_nodes(navigation, doc_dict)
-    for k,v in nav_table.iteritems():
-        if "(" in v['branch_name']:
-            pass
-        else:
-            value = v['branch_name'] + " (" + str(doc_dict[k]) + ")"
-            v['branch_name'] = value
+    for k, v in nav_table.iteritems():
+        try:
+            if v['branch_docs_nb']:
+                # if no docs under the current node display the number of docs in black
+                if str(v['branch_docs_nb']) == str(0):
+                    value = v['branch_name'] + " (" + str(doc_dict[k]) + ")"
+                    v['branch_name'] = value
+                    del v['branch_docs_nb']
+        except:
+            # if no docs under the current node display the number of docs in black
+            if str(doc_dict[k]) != str(0):
+                v['branch_docs_nb'] = str(doc_dict[k])
+            else:
+                value = v['branch_name'] + " (" + str(doc_dict[k]) + ")"
+                v['branch_name'] = value
 
     nav_tree_html = render_html_tree(navigation, template_id, tab, nav_table)
     return nav_tree_html
