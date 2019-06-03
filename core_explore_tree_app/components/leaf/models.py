@@ -41,6 +41,24 @@ class Leaf(Document):
         except Exception as ex:
             raise exceptions.ModelError(ex.message)
 
+    @staticmethod
+    def get_by_current_node_id(current_node_id):
+        """ Return the object with the given id.
+
+        Args:
+            current_node_id:
+
+        Returns:
+            Leaf Objects
+
+        """
+        try:
+            return Leaf.objects.get(current_node_id=str(current_node_id))
+        except mongoengine_errors.DoesNotExist as e:
+            raise exceptions.DoesNotExist(e.message)
+        except Exception as ex:
+            raise exceptions.ModelError(ex.message)
+
     def save_object(self):
         """ Custom save.
 

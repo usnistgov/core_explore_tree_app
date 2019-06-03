@@ -12,14 +12,9 @@
     </div>
 {% else %}
     <!-- template-based caching -->
-    <div>
-        <a class="btn btn-default pull-right" style="margin-right: 10px;" onclick="clear_cache_options()">
-            Clear cache
-        </a>
-    </div>
     <div></div>
     <div>
-        <a class="btn btn-default pull-right" style="margin-right: 10px;" onclick="cache_all_tree_files()">
+        <a class="btn btn-default pull-right" onclick="cache_all_tree_files()">
             Cache all files from the tree
         </a>
     </div>
@@ -43,7 +38,11 @@
     </div>
 
 {% endif %}
-
+<div>
+    <a class="btn btn-default pull-right" onclick="clear_cache_options()">
+        Clear cache
+    </a>
+</div>
 {% endblock %}
 {% block footer %}
 

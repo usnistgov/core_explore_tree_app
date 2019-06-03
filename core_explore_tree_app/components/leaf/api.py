@@ -39,19 +39,25 @@ def upsert_leaf_object(node_id, doc_id):
         Returns:
 
         """
-    exist = False
-    leaves = Leaf.get_all()
-    for leaf in leaves:
-        if leaf.current_node_id == node_id:
-            # Node already exist
-            update_docs_list(leaf, doc_id)
-            upsert(leaf)
-            exist = True
-            break
-    if exist == False:
-        # Leaf does not exist => create a list that will contains the id of docs for this node
+    try:
+        leaf = get_by_current_node_id(node_id)
+        # if leaf already exists in the DB => add to the list of the docs under this leaf id of the current doc
+        update_docs_list(leaf, doc_id)
+        upsert(leaf)
+    except:
+        # Leaf does not exists => create a list that will contains the id of docs for this node
         leaf = Leaf(current_node_id=node_id, docs_list=[doc_id])
         upsert(leaf)
+
+
+def get_by_current_node_id(leaf_id):
+    """ Return the object with the given id
+    Args:
+     leaf_id:
+    Return:
+        Leaf(obj): Leaf object
+    """
+    return Leaf.get_by_current_node_id(leaf_id)
 
 
 def clean_leaves_objects():
@@ -59,5 +65,5 @@ def clean_leaves_objects():
 
         Returns:
 
-        """
+    """
     return Leaf.delete_objects()
