@@ -101,7 +101,7 @@ def get_html_tree(navigation, template_id, tab, nav_table):
                     value = v['branch_name'] + " (" + str(doc_dict[k]) + ")"
                     v['branch_name'] = value
                     del v['branch_docs_nb']
-        except:
+        except Exception as e:
             # if no docs under the current node display the number of docs in black
             if str(doc_dict[k]) != str(0):
                 v['branch_docs_nb'] = str(doc_dict[k])
@@ -191,7 +191,7 @@ def render_documents(navigation, template_id, number_of_docs=0):
                 number_of_docs += 1
             leaf_api.upsert_leaf_object(str(leaf_id), str(document.id))
 
-    except Exception, e:
+    except Exception as e:
         with open(join(TEMPLATES_PATH, 'li_error.html'), 'r') as li_file:
             li_content = li_file.read()
             li_template = Template(li_content)
@@ -215,7 +215,7 @@ def get_number_of_node_doc(id_node, name, nav_table):
     """
     try:
         return " "+str(nav_table[id_node]['branch_name'])
-    except:
+    except Exception as e:
         return name
 
 
@@ -236,7 +236,7 @@ def get_doc_by_nodes(node, dico):
         else:
             return dico[node.id]
 
-    except:  # node = ID of a Navigation object
+    except Exception as e:  # node = ID of a Navigation object
         nav_child = get_by_id(node)
         if nav_child.children:
             node_doc = sum([get_doc_by_nodes(child_id, dico) for child_id in nav_child.children])

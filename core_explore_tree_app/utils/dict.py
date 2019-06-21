@@ -1,6 +1,9 @@
 """  Utils for Dicts in order to process them and use their information for the function that allows to
    download the displayed data in a document on the tree
 """
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_values_items(dict_structure, values):
@@ -38,7 +41,7 @@ def check_empty_nodes(xml):
     for child in xml.getiterator():
         # Fixme if len(child.getchildren()==0
         if child.getchildren():
-            pass
+            logger.info("check_empty_nodes no children")
         else:
             if child.text == "":
                 return True
@@ -63,5 +66,5 @@ def remove_empty_nodes(xml):
                 try:
                     parent = child.findall("..")
                     parent[0].remove(child)
-                except:
-                    pass
+                except Exception as e:
+                    logger.warning("remove_empty_nodes threw an exception: {0}".format(str(e)))

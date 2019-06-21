@@ -266,8 +266,9 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                         result_query = get_projection(queried_data[0])
                         # Add the result of the query to the result list for the current doc
                         result_list.append(str(result_query))
-                    except:
-                        pass
+                    except Exception as e:
+                        logger.warning("_load_data_view threw an exception: {0}".format(str(e)))
+
                 dict_id_and_queries_cross_docs[id_doc] = query_list
                 dict_id_and_queryresults_cross_docs[id_doc] = result_list
         # Get info from main doc
@@ -377,7 +378,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                     child.text = ""
             else:
                 if text == str(dict_tags_values_main_doc[child.tag]) or dict_tags_values_main_doc[child.tag] in text:
-                    pass
+                    logger.info("_load_data_view: log silent if")
                 else:
                     child.text = ""
         else:

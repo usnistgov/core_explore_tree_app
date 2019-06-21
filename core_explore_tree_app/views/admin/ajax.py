@@ -1,28 +1,28 @@
 """ explore tree Admin ajax file
 """
 import json
+import logging
 
-from django.http import HttpResponseBadRequest, HttpResponse
-from django.urls import reverse_lazy
-from django.core.cache import caches
 from django.contrib import messages
 from django.contrib.messages.storage.base import Message
+from django.core.cache import caches
+from django.http import HttpResponseBadRequest, HttpResponse
+from django.urls import reverse_lazy
 
-import core_explore_tree_app.components.query_ontology.api as query_ontology_api
+import core_cache_manager_app.components.data_cached.api as data_cached_api
 import core_explore_tree_app.components.leaf.api as leaf_api
 import core_explore_tree_app.components.navigation.api as navigation_api
-import core_cache_manager_app.components.data_cached.api as data_cached_api
-
+import core_explore_tree_app.components.query_ontology.api as query_ontology_api
 from core_explore_tree_app.commons.enums import QueryOntologyStatus
+from core_explore_tree_app.components.leaf.models import Leaf
+from core_explore_tree_app.components.navigation.models import Navigation
 from core_explore_tree_app.components.query_ontology.models import QueryOntology
 from core_explore_tree_app.views.admin.forms import EditOntologyForm
 from core_explore_tree_app.views.user.ajax import load_view
-from core_explore_tree_app.components.navigation.models import Navigation
-from core_explore_tree_app.components.leaf.models import Leaf
-
 from core_main_app.commons import exceptions
 from core_main_app.views.common.ajax import EditObjectModalView, DeleteObjectModalView
 
+logger = logging.getLogger(__name__)
 
 html_tree_cache = caches['html_tree']
 navigation_cache = caches['navigation']
@@ -45,7 +45,7 @@ def disable_query_ontology(request):
         query_ontology_api.edit_status(query_ontology_api.get_by_id(request.POST['id']),
                                        QueryOntologyStatus.disabled.value)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
-    except Exception, e:
+    except Exception as e:
         return HttpResponseBadRequest(e.message, content_type='application/javascript')
 
 
@@ -62,7 +62,7 @@ def restore_query_ontology(request):
         query_ontology_api.edit_status(query_ontology_api.get_by_id(request.POST['id']),
                                        QueryOntologyStatus.uploaded.value)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
-    except Exception, e:
+    except Exception as e:
         return HttpResponseBadRequest(e.message, content_type='application/javascript')
 
 
@@ -79,7 +79,7 @@ def activate_query_ontology(request):
         query_ontology_api.edit_status(query_ontology_api.get_by_id(request.POST['id']),
                                        QueryOntologyStatus.active.value)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
-    except Exception, e:
+    except Exception as e:
         return HttpResponseBadRequest(e.message, content_type='application/javascript')
 
 
@@ -98,7 +98,7 @@ class EditOntologyView(EditObjectModalView):
         except exceptions.NotUniqueError:
             form.add_error(None, "An object with the same name already exists. Please choose "
                                  "another name.")
-        except Exception, e:
+        except Exception as e:
             form.add_error(None, e.message)
 
     def get_initial(self):
@@ -159,6 +159,7 @@ def core_cache_all_files(request):
         message = Message(messages.ERROR, 'An error occurred while caching the files.')
         return HttpResponseBadRequest(message, content_type='application/javascript')
 
+
 def get_leafs_nodes(navigation_id, l):
     """ Function that gets all leaves nodes under the current node.
 
@@ -174,8 +175,8 @@ def get_leafs_nodes(navigation_id, l):
             [get_leafs_nodes(child, l) for child in node.children]
         else:
             l.append(node.id)
-    except:
-            pass
+    except Exception as e:
+        logger.warning("get_leafs_nodes threw an exception: {0}".format(str(e)))
 
 
 def cache_docs_from_leaf(node_id, request, nav_root_id):

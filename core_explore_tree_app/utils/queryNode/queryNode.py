@@ -1,6 +1,10 @@
 """ Node Class that represents a structure from a query and its value
 """
+import logging
+
 from itertools import izip, tee
+
+logger = logging.getLogger(__name__)
 
 
 class QueryNode(object):
@@ -49,7 +53,7 @@ class QueryNode(object):
         for child in self.getiterator():
             # Fixme if len(child.getchildren()==0
             if child.getchildren():
-                pass
+                logger.info("set_texts no children")
             else:
                 child.text = list_of_texts[i]
                 i += 1

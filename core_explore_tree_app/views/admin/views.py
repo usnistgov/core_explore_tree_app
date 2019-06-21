@@ -120,7 +120,7 @@ def upload_query_ontology(request):
             except exceptions.NotUniqueError:
                 context['errors'] = html_escape("An Ontology with the same name already exists. "
                                                 "Please choose another name.")
-            except Exception, e:
+            except Exception as e:
                 context['errors'] = html_escape(e.message)
     # method is GET
     else:
