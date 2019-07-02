@@ -11,7 +11,7 @@ from core_explore_tree_app.commons.enums import QueryOntologyStatus
 from core_explore_tree_app.components.query_ontology import api as query_ontology_api
 from core_explore_tree_app.rest.query_ontology.serializers import QueryOntologySerializer
 from core_main_app.commons import exceptions
-from core_main_app.utils.access_control.exceptions import AccessControlError
+from core_main_app.access_control.exceptions import AccessControlError
 from core_main_app.utils.decorators import api_staff_member_required
 from core_main_app.utils.file import get_file_http_response
 
