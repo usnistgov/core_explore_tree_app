@@ -51,7 +51,7 @@ def execute_query(template_id, filters=None, projection=None):
             # Loads filter and projection
             json_filter = json.loads(_filter)
             json_projection = json.loads(projection)
-        except Exception, e:
+        except Exception as e:
             raise ApiError("Query parsing failed (%s)" % e.message)
 
         if _is_advanced_filter(_filter):

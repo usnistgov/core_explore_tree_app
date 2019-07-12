@@ -1,5 +1,6 @@
 """ Node Class that represents a structure from a query and its value
 """
+
 import logging
 
 from itertools import izip, tee
