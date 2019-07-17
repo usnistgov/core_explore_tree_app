@@ -237,7 +237,7 @@ def core_cache_view_index(request):
                 for datacached in listof_leaf:
                     dict_keys_docs_id = datacached.cached_documents_dict
                     for dict_key_docid in dict_keys_docs_id:
-                        key_docid_list = dict_key_docid.keys()
+                        key_docid_list = list(dict_key_docid.keys())
                         for key in key_docid_list:
                             if key in leaf_cache or key in link_cache:
                                 number_cached_docs += 1

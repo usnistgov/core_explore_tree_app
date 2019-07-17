@@ -2,8 +2,8 @@
 """
 
 import logging
-
-from itertools import izip, tee
+from builtins import next, zip, object
+from itertools import tee
 
 logger = logging.getLogger(__name__)
 
@@ -132,7 +132,7 @@ def iter_2_by_2(iterable):
     # for a s -> (s0,s1), (s1,s2), (s2, s3)
     a, b = tee(iterable)
     next(b, None)
-    return izip(a, b)
+    return zip(a, b)
 
 
 def rec_xml_to_string(tree):

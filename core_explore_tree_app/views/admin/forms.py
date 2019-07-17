@@ -1,5 +1,6 @@
 """ Forms for admin views
 """
+from builtins import object
 from django import forms
 from mongodbforms import DocumentForm
 
@@ -28,7 +29,7 @@ class EditOntologyForm(DocumentForm):
     template = forms.ChoiceField(label='Select the associated template',
                                  widget=forms.Select(attrs={"class": "form-control"}))
 
-    class Meta:
+    class Meta(object):
         document = QueryOntology
         fields = ['title', 'template']
 

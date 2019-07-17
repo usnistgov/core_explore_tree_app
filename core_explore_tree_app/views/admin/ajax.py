@@ -148,7 +148,7 @@ def core_cache_all_files(request):
             dico_list[navigation_id] = leaves_nodes
         # Cache all includes files under the node
         if dico_list:
-            for k, v in dico_list.items():
+            for k, v in list(dico_list.items()):
                 for leaf_id in v:
                     cache_docs_from_leaf(leaf_id, request, nav_root_id)
         else:

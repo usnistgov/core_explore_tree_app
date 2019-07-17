@@ -10,7 +10,7 @@ def get_projection(document):
 
     Returns:
     """
-    keys = document.dict_content.keys()
+    keys = list(document.dict_content.keys())
     if len(keys) == 0:
         return document.id
     for key in keys:
@@ -25,7 +25,7 @@ def get_projection_value(document):
 
     Returns:
     """
-    value = document[document.keys()[0]]
+    value = document[list(document.keys())[0]]
     if isinstance(value, dict):
         return get_projection_value(value)
     else:

@@ -17,7 +17,7 @@ def _is_advanced_filter(str_filter):
         json_filter = json.loads(str_filter)
         expected_keys = {"documents", "query"}
 
-        return len(expected_keys.difference(json_filter.keys())) == 0
+        return len(expected_keys.difference(list(json_filter.keys()))) == 0
     except ValueError:  # Only error that json.loads can raise
         return False
 
@@ -58,7 +58,7 @@ def execute_query(template_id, filters=None, projection=None):
             # Get matching document
             #   list possible values of the right hand side
             #   match resulted documents
-            documents_field = json_filter["documents"].values()[0]
+            documents_field = list(json_filter["documents"].values())[0]
 
             values = get_filter_values(documents_field)
             matching_documents = get_matching_document(template_id,
@@ -67,10 +67,11 @@ def execute_query(template_id, filters=None, projection=None):
                                                        json_filter["query"])
 
             for doc in matching_documents:
-                doc_cross_query = {json_filter["documents"].values()[0]: get_projection(doc)}
-                filter_result += system_api.execute_query_with_projection(doc_cross_query, json_projection.keys()[0])
+                doc_cross_query = {list(json_filter["documents"].values())[0]: get_projection(doc)}
+                filter_result += system_api.execute_query_with_projection(doc_cross_query,
+                                                                          list(json_projection.keys())[0])
         else:
-            filter_result = system_api.execute_query_with_projection(json_filter, json_projection.keys()[0])
+            filter_result = system_api.execute_query_with_projection(json_filter, list(json_projection.keys())[0])
 
         filter_id = {document.id for document in filter_result}
         data_id_list = data_id_list.intersection(filter_id)

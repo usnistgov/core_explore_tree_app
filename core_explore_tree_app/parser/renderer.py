@@ -93,7 +93,7 @@ def get_html_tree(navigation, template_id, tab, nav_table):
             doc_dict[t[0]] = t[1]
             dashtable.append(t[0])
     get_doc_by_nodes(navigation, doc_dict)
-    for k, v in nav_table.iteritems():
+    for k, v in nav_table.items():
         try:
             if v['branch_docs_nb']:
                 # if no docs under the current node display the number of docs in black

@@ -1,5 +1,6 @@
 """ Serializers used throughout the query ontology Rest API
 """
+from builtins import object
 from rest_framework_mongoengine.serializers import DocumentSerializer
 
 from core_explore_tree_app.components.query_ontology import api as query_ontology_api
@@ -10,7 +11,7 @@ class QueryOntologySerializer(DocumentSerializer):
     """ Query Ontology serializer
     """
 
-    class Meta:
+    class Meta(object):
         """ Meta
         """
         model = QueryOntology

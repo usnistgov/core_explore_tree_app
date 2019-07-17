@@ -90,7 +90,7 @@ def _create_navigation_branches(tree, parent):
     """
     children_ids = []
 
-    for name, values in tree.iteritems():
+    for name, values in tree.items():
         # create navigation
         navigation = Navigation(
             name=name,

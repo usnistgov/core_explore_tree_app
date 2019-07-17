@@ -1,5 +1,6 @@
 """ Ajax calls for the exploration tree
 """
+from builtins import zip
 import json
 
 from bson import ObjectId
@@ -60,7 +61,7 @@ def load_view(request):
         node_name = get_node_name(node_id)
         id_docleaf_cached = str(node_name) + '_' + str(doc_id)
         # Get the document from the cache if this one had ever been accessed
-        for key, value in listof.items():
+        for key, value in list(listof.items()):
             if id_docleaf_cached == key:
                 # from leaf cache
                 load_doc = leaf_cache.get(key)
@@ -101,7 +102,7 @@ def load_view(request):
         navigation_node = None
         id_doclink_cached = ref_node_id + '_' + doc_id
         # The file was cached by clicking a link from a document
-        if id_doclink_cached in listof.keys() or id_doclink_cached in link_cache:
+        if id_doclink_cached in list(listof.keys()) or id_doclink_cached in link_cache:
             load_doc = link_cache.get(id_doclink_cached)
         else:
             navigation_node = navigation_operations.get_navigation_node_for_document(ref_node_id, doc_id)
@@ -110,7 +111,7 @@ def load_view(request):
             node_name = nodename[nodename_index + 1:]
             id_doc_cached = node_name + "_" + str(doc_id)
             # The file was cached by using the cache manager tool
-            if id_doc_cached in listof.keys():
+            if id_doc_cached in list(listof.keys()):
                 load_doc = leaf_cache.get(id_doc_cached)
                 link_cache.set(id_doclink_cached, load_doc)
         if not load_doc:
@@ -230,7 +231,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
 
         # FIXME better handling of x-queries
         # Get info from other doc (without the main queried document)
-        if "query" in projection_view.keys():
+        if "query" in list(projection_view.keys()):
             doc_projections = []
             # Get the names of the tags tag need to be displayed
             for value in projection_view["data"]:
@@ -258,9 +259,9 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                         doc_projections[doc_projections.index(projection)]: 1
                     }
                     # Get the Data corresponding to the id
-                    queried_data = Data.execute_query(other_doc_query).only(query_path.keys()[0])
+                    queried_data = Data.execute_query(other_doc_query).only(list(query_path.keys())[0])
                     # Add the query to the query list for the current doc
-                    query_list.append(query_path.keys()[0].replace("dict_content.", ""))
+                    query_list.append(list(query_path.keys())[0].replace("dict_content.", ""))
                     try:
                         # Get the result of the query
                         result_query = get_projection(queried_data[0])
@@ -346,9 +347,9 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
     file_content = data.xml_content
     xml_main_doc = XSDTree.fromstring(file_content)
     # Transform all the result value into a string to help while testing equality of values with the original XML
-    for key, value in dict_tags_values_main_doc.items():
+    for key, value in list(dict_tags_values_main_doc.items()):
         if isinstance(value, list):
-            dict_tags_values_main_doc[key] = map(lambda x: x if isinstance(x, unicode) else str(x), value)
+            dict_tags_values_main_doc[key] = [x if isinstance(x, str) else str(x) for x in value]
         else:
             try:
                 dict_tags_values_main_doc[key] = str(value)
@@ -366,7 +367,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
         # If the xml tag is in our dict of tags and values from the main document
         # and its value = dict_tags_values_main_doc[child.tag] we keep the text in the XML structure
         # else we remove the text
-        if child.tag in dict_tags_values_main_doc.keys():
+        if child.tag in list(dict_tags_values_main_doc.keys()):
             # Fixme  # if text != str(dict_tags_values_main_doc[child.tag]) or dict_tags_values_main_doc[child.tag] not in text: (caution: does not keep all needed values if we replace by this line)
             if isinstance(dict_tags_values_main_doc[child.tag],list):
                 display_value = False
