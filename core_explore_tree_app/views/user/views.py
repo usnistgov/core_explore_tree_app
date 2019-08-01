@@ -58,7 +58,7 @@ def core_explore_tree_index(request):
         error = {"error": "An Ontology should be active to explore. Please contact an admin."}
     except Exception as e:
         error = {"error": "An error occurred during the generation of the navigation tree."}
-        logger.error('ERROR : {0}'.format(e.message))
+        logger.error('ERROR : {0}'.format(str(e)))
 
     if error:
         context.update(error)

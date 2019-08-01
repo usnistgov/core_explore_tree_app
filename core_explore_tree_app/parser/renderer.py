@@ -197,7 +197,7 @@ def render_documents(navigation, template_id, number_of_docs=0):
             li_template = Template(li_content)
 
         context = {
-            "error_message": e.message
+            "error_message": str(e)
         }
 
         doc_tree_html = li_template.render(Context(context))

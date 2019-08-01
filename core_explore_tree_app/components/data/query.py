@@ -52,7 +52,7 @@ def execute_query(template_id, filters=None, projection=None):
             json_filter = json.loads(_filter)
             json_projection = json.loads(projection)
         except Exception as e:
-            raise ApiError("Query parsing failed (%s)" % e.message)
+            raise ApiError("Query parsing failed (%s)" % str(e))
 
         if _is_advanced_filter(_filter):
             # Get matching document
@@ -62,7 +62,7 @@ def execute_query(template_id, filters=None, projection=None):
 
             values = get_filter_values(documents_field)
             matching_documents = get_matching_document(template_id,
-                                                       json_filter["documents"].keys()[0],
+                                                       list(json_filter["documents"].keys())[0],
                                                        values,
                                                        json_filter["query"])
 

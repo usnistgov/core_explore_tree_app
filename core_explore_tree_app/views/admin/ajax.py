@@ -46,7 +46,7 @@ def disable_query_ontology(request):
                                        QueryOntologyStatus.disabled.value)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
     except Exception as e:
-        return HttpResponseBadRequest(e.message, content_type='application/javascript')
+        return HttpResponseBadRequest(str(e), content_type='application/javascript')
 
 
 def restore_query_ontology(request):
@@ -63,7 +63,7 @@ def restore_query_ontology(request):
                                        QueryOntologyStatus.uploaded.value)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
     except Exception as e:
-        return HttpResponseBadRequest(e.message, content_type='application/javascript')
+        return HttpResponseBadRequest(str(e), content_type='application/javascript')
 
 
 def activate_query_ontology(request):
@@ -80,7 +80,7 @@ def activate_query_ontology(request):
                                        QueryOntologyStatus.active.value)
         return HttpResponse(json.dumps({}), content_type='application/javascript')
     except Exception as e:
-        return HttpResponseBadRequest(e.message, content_type='application/javascript')
+        return HttpResponseBadRequest(str(e), content_type='application/javascript')
 
 
 class EditOntologyView(EditObjectModalView):
@@ -99,7 +99,7 @@ class EditOntologyView(EditObjectModalView):
             form.add_error(None, "An object with the same name already exists. Please choose "
                                  "another name.")
         except Exception as e:
-            form.add_error(None, e.message)
+            form.add_error(None, str(e))
 
     def get_initial(self):
         initial = super(EditOntologyView, self).get_initial()

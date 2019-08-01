@@ -37,9 +37,9 @@ class Leaf(Document):
         try:
             return Leaf.objects.get(pk=str(leaf_id))
         except mongoengine_errors.DoesNotExist as e:
-            raise exceptions.DoesNotExist(e.message)
+            raise exceptions.DoesNotExist(str(e))
         except Exception as ex:
-            raise exceptions.ModelError(ex.message)
+            raise exceptions.ModelError(str(ex))
 
     @staticmethod
     def get_by_current_node_id(current_node_id):
@@ -55,9 +55,9 @@ class Leaf(Document):
         try:
             return Leaf.objects.get(current_node_id=str(current_node_id))
         except mongoengine_errors.DoesNotExist as e:
-            raise exceptions.DoesNotExist(e.message)
+            raise exceptions.DoesNotExist(str(e))
         except Exception as ex:
-            raise exceptions.ModelError(ex.message)
+            raise exceptions.ModelError(str(ex))
 
     def save_object(self):
         """ Custom save.
@@ -69,9 +69,9 @@ class Leaf(Document):
         try:
             return self.save()
         except mongoengine_errors.NotUniqueError as e:
-            raise exceptions.NotUniqueError(e.message)
+            raise exceptions.NotUniqueError(str(e))
         except Exception as ex:
-            raise exceptions.ModelError(ex.message)
+            raise exceptions.ModelError(str(ex))
 
     @staticmethod
     def delete_objects():

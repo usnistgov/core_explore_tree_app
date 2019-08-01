@@ -345,7 +345,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
     data = Data.get_by_id(data_id)
     # Get the XML content
     file_content = data.xml_content
-    xml_main_doc = XSDTree.fromstring(file_content)
+    xml_main_doc = XSDTree.fromstring(file_content.encode("utf-8", "ignore"))
     # Transform all the result value into a string to help while testing equality of values with the original XML
     for key, value in list(dict_tags_values_main_doc.items()):
         if isinstance(value, list):
@@ -407,8 +407,6 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
     xml_main_doc = XSDTree.tostring(xml_f_main_doc, pretty="TRUE")
     xml = xml_main_doc + xml_cross_queries_string
     xml_final = "<xml>\n" + xml + "</xml>"
-    xml_final = u''.join(xml_final).encode('utf-8')
-    xml_final = str(xml_final)
     view_data["download"] = xml_final
     if from_tree:
         return view_data

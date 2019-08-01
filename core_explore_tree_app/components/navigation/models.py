@@ -26,7 +26,7 @@ class Navigation(Document):
         except NotUniqueError:
             raise exceptions.ModelError("Unable to save the navigation object: not unique.")
         except Exception as ex:
-            raise exceptions.ModelError(ex.message)
+            raise exceptions.ModelError(str(ex))
 
     @staticmethod
     def get_all():
@@ -52,9 +52,9 @@ class Navigation(Document):
         try:
             return Navigation.objects.get(pk=str(navigation_id))
         except mongoengine_errors.DoesNotExist as e:
-            raise exceptions.DoesNotExist(e.message)
+            raise exceptions.DoesNotExist(str(e))
         except Exception as ex:
-            raise exceptions.ModelError(ex.message)
+            raise exceptions.ModelError(str(ex))
 
     @staticmethod
     def get_by_name(navigation_name):

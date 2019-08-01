@@ -49,9 +49,9 @@ class QueryOntology(Document):
         try:
             return QueryOntology.objects.get(status=QueryOntologyStatus.active.value)
         except mongoengine_errors.DoesNotExist as e:
-            raise exceptions.DoesNotExist(e.message)
+            raise exceptions.DoesNotExist(str(e))
         except Exception as ex:
-            raise exceptions.ModelError(ex.message)
+            raise exceptions.ModelError(str(ex))
 
     @staticmethod
     def get_by_id(query_ontology_id):
@@ -67,9 +67,9 @@ class QueryOntology(Document):
         try:
             return QueryOntology.objects.get(pk=str(query_ontology_id))
         except mongoengine_errors.DoesNotExist as e:
-            raise exceptions.DoesNotExist(e.message)
+            raise exceptions.DoesNotExist(str(e))
         except Exception as ex:
-            raise exceptions.ModelError(ex.message)
+            raise exceptions.ModelError(str(ex))
 
     def save_object(self):
         """ Custom save.
@@ -81,6 +81,6 @@ class QueryOntology(Document):
         try:
             return self.save()
         except mongoengine_errors.NotUniqueError as e:
-            raise exceptions.NotUniqueError(e.message)
+            raise exceptions.NotUniqueError(str(e))
         except Exception as ex:
-            raise exceptions.ModelError(ex.message)
+            raise exceptions.ModelError(str(ex))

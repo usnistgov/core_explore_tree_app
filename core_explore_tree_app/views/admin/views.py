@@ -121,7 +121,7 @@ def upload_query_ontology(request):
                 context['errors'] = html_escape("An Ontology with the same name already exists. "
                                                 "Please choose another name.")
             except Exception as e:
-                context['errors'] = html_escape(e.message)
+                context['errors'] = html_escape(str(e))
     # method is GET
     else:
         # render the form to upload a query ontology
@@ -248,7 +248,7 @@ def core_cache_view_index(request):
         error = {"error": "An Ontology should be active to explore. Please contact an admin."}
     except Exception as e:
         error = {"error": "An error occurred when displaying the cache status."}
-        logger.error('ERROR : {0}'.format(e.message))
+        logger.error('ERROR : {0}'.format(str(e)))
 
     if error:
         context.update(error)
@@ -304,7 +304,7 @@ def core_cache_manager_index(request):
         except Exception as e:
             error = {"error": "No navigation tree generated. "
                               "Please go to the 'Data Exploration' menu to build the tree before using the cache."}
-            logger.error('ERROR : {0}'.format(e.message))
+            logger.error('ERROR : {0}'.format(str(e)))
 
     if error:
         context.update(error)
