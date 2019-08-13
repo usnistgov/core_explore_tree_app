@@ -208,7 +208,7 @@ def process_cross_query(navigation_root_id, document_id, query, json_content):
         list(query.values())[0]: 1
     }
 
-    document_list = Data.execute_query(doc_query).only(list(doc_projection.keys())[0])
+    document_list = Data.execute_query(doc_query, []).only(list(doc_projection.keys())[0])
     document_projection_value = get_projection(document_list[0])
 
     cross_query = {
@@ -218,7 +218,7 @@ def process_cross_query(navigation_root_id, document_id, query, json_content):
         "id": 1
     }
 
-    cross_documents = Data.execute_query(cross_query).only(list(cross_projection.keys())[0])
+    cross_documents = Data.execute_query(cross_query, []).only(list(cross_projection.keys())[0])
 
     cross_documents_ids = [get_projection(cross_doc) for cross_doc in cross_documents]
 

@@ -259,7 +259,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                         doc_projections[doc_projections.index(projection)]: 1
                     }
                     # Get the Data corresponding to the id
-                    queried_data = Data.execute_query(other_doc_query).only(list(query_path.keys())[0])
+                    queried_data = Data.execute_query(other_doc_query, []).only(list(query_path.keys())[0])
                     # Add the query to the query list for the current doc
                     query_list.append(list(query_path.keys())[0].replace("dict_content.", ""))
                     try:
