@@ -43,7 +43,7 @@ class QueryOntologyList(APIView):
             # Return response
             return Response(query_ontology_serializer.data, status=status.HTTP_200_OK)
         except Exception as api_exception:
-            content = {'message': api_exception.message}
+            content = {'message': str(api_exception)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @method_decorator(api_staff_member_required())
@@ -92,7 +92,7 @@ class QueryOntologyList(APIView):
             content = {'message': 'Query Ontology not found.'}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
         except Exception as api_exception:
-            content = {'message': api_exception.message}
+            content = {'message': str(api_exception)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -144,7 +144,7 @@ class QueryOntologyDownload(APIView):
             content = {'message': 'Query Ontology not found.'}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
         except Exception as api_exception:
-            content = {'message': api_exception.message}
+            content = {'message': str(api_exception)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
