@@ -2,7 +2,7 @@
 """
 from builtins import object
 from django import forms
-from mongodbforms import DocumentForm
+from django_mongoengine.forms import DocumentForm
 
 from core_explore_tree_app.components.query_ontology.models import QueryOntology
 from core_main_app.components.template import api as template_api
@@ -13,7 +13,7 @@ class UploadQueryOntologyForm(UploadForm):
     """ Form to upload a new Query Ontology file
     """
     templates_manager = forms.ChoiceField(label='Select the associated template',
-                                 widget=forms.Select(attrs={"class": "form-control"}))
+                                          widget=forms.Select(attrs={"class": "form-control"}))
 
     def __init__(self, *args, **kwargs):
         super(UploadQueryOntologyForm, self).__init__(*args, **kwargs)

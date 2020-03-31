@@ -31,9 +31,8 @@ def core_explore_tree_index(request):
     try:
         # get the active ontology
         active_ontology = query_ontology_api.get_active()
-
         # get the navigation from the cache
-        nav_key = active_ontology.id
+        nav_key = str(active_ontology.id)
         if nav_key in navigation_cache:
             navigation = navigation_cache.get(nav_key)
         else:
@@ -42,13 +41,13 @@ def core_explore_tree_index(request):
             navigation_cache.set(nav_key, navigation)
 
         # get the tree from the cache
-        tree_key = navigation.id
+        tree_key = str(navigation.id)
         if tree_key in html_tree_cache:
             html_tree = html_tree_cache.get(tree_key)
         else:
             # create the html tree
             html_tree = render_navigation_tree(navigation, active_ontology.template.id)
-            html_tree_cache.set(tree_key, html_tree)
+            html_tree_cache.set(str(tree_key), html_tree)
 
         context = {
             'navigation_tree': html_tree,

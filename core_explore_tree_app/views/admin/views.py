@@ -5,7 +5,7 @@ import logging
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.staticfiles import finders
 from django.core.cache import caches
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http.response import HttpResponseRedirect
 from django.utils.html import escape as html_escape
 
@@ -108,7 +108,7 @@ def upload_query_ontology(request):
 
     # method is POST
     if request.method == 'POST':
-        form = UploadQueryOntologyForm(request.POST,  request.FILES)
+        form = UploadQueryOntologyForm(request.POST, request.FILES)
         context['upload_form'] = form
 
         if form.is_valid():
@@ -220,16 +220,15 @@ def core_cache_view_index(request):
         active_ontology = query_ontology_api.get_active()
 
         # get the navigation from the cache
-        nav_key = active_ontology.id
+        nav_key = str(active_ontology.id)
         if nav_key in navigation_cache:
             navigation = navigation_cache.get(nav_key)
-            context["navigation_id"] = navigation.id
+            context["navigation_id"] = str(navigation.id)
             # get the tree from the cache ### REMOVE if we don't display the tree
-            tree_key = navigation.id
+            tree_key = str(navigation.id)
             if tree_key in html_tree_cache:
                 html_tree = html_tree_cache.get(tree_key)
                 context["navigation_tree"] = html_tree
-
                 number_cached_docs = 0
                 cache_list = []
                 listof_leaf = DataCached.get_all()
@@ -284,12 +283,12 @@ def core_cache_manager_index(request):
     if error is None:
         try:
             # get the navigation from the cache
-            nav_key = active_ontology.id
+            nav_key = str(active_ontology.id)
             if nav_key in navigation_cache:
                 navigation = navigation_cache.get(nav_key)
                 context["navigation_root_id"] = navigation.id
                 # get the tree from the cache
-                tree_key = navigation.id
+                tree_key = str(navigation.id)
                 if tree_key in html_tree_cache:
                     html_tree = html_tree_cache.get(tree_key)
                     context["navigation_tree"] = html_tree

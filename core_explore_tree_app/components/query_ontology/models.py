@@ -4,7 +4,7 @@ from django_mongoengine import fields, Document
 from mongoengine import errors as mongoengine_errors
 
 from core_explore_tree_app.commons.enums import QueryOntologyStatus
-from core_main_app.commons.regex import NOT_EMPTY_OR_WHITESPACES
+from core_main_app.utils.validation.regex_validation import not_empty_or_whitespaces
 from core_main_app.commons import exceptions
 from core_main_app.components.template.models import Template
 
@@ -12,7 +12,7 @@ from core_main_app.components.template.models import Template
 class QueryOntology(Document):
     """ Ontology of queries to generate the navigation tree
     """
-    title = fields.StringField(unique=True, blank=False, regex=NOT_EMPTY_OR_WHITESPACES)
+    title = fields.StringField(unique=True, blank=False, validation=not_empty_or_whitespaces)
     status = fields.IntField(default=0, blank=False)  # 0: Uploaded; 1: Active; 2: Blank; -1: Deleted
     last_modification_date = fields.DateTimeField(blank=True)
     content = fields.StringField(blank=False)

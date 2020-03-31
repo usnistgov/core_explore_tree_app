@@ -1,6 +1,6 @@
 """ Menu configuration for core_explore_tree_app.
 """
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from menu import Menu, MenuItem
 
 from core_explore_tree_app.settings import EXPLORE_TREE_MENU_NAME
@@ -25,6 +25,3 @@ Menu.add_item(
 Menu.add_item(
     "main", MenuItem(EXPLORE_TREE_MENU_NAME, reverse("core_explore_tree_index"))
 )
-
-
-

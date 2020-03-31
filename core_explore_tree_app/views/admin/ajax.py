@@ -129,12 +129,12 @@ def core_cache_all_files(request):
     """
     try:
         # cache all the files from the current node
-        root_node_id = request.POST.get("node_id",None)
+        root_node_id = request.POST.get("node_id", None)
         root_node = Navigation.get_by_id(root_node_id)
 
         active_ontology = query_ontology_api.get_active()
         # get the navigation from the cache
-        nav_key = active_ontology.id
+        nav_key = str(active_ontology.id)
         # get id of the navigation root
         if nav_key in navigation_cache:
             navigation = navigation_cache.get(nav_key)
@@ -154,7 +154,8 @@ def core_cache_all_files(request):
         else:
             cache_docs_from_leaf(root_node_id, request, nav_root_id)
         message = Message(messages.SUCCESS, 'Documents cached with success.')
-        return HttpResponse(json.dumps({'message': message.message, 'tags': message.tags}), content_type='application/json')
+        return HttpResponse(json.dumps({'message': message.message, 'tags': message.tags}),
+                            content_type='application/json')
     except:
         message = Message(messages.ERROR, 'An error occurred while caching the files.')
         return HttpResponseBadRequest(message, content_type='application/javascript')
