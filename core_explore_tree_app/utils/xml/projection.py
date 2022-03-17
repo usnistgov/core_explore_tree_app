@@ -1,9 +1,9 @@
-#from exceptions import CDCSError
+# from exceptions import CDCSError
 # FIXME: pymongo syntax. Check why we need that and translate to mongoengine if needed.
 
 
 def get_projection(document):
-    """ Get the value returned by the projection
+    """Get the value returned by the projection
 
     Args:
         document: Data Object
@@ -18,7 +18,7 @@ def get_projection(document):
 
 
 def get_projection_value(document):
-    """ Get the value returned by the projection
+    """Get the value returned by the projection
 
     Args:
         document:

@@ -8,7 +8,7 @@ from core_explore_tree_app.components.leaf import api as leaf_api
 
 
 def get_by_id(navigation_id):
-    """ Return Navigation object with the given id.
+    """Return Navigation object with the given id.
 
     Args:
         navigation_id:
@@ -20,7 +20,7 @@ def get_by_id(navigation_id):
 
 
 def get_by_name(navigation_name):
-    """ Return Navigation object with the given name.
+    """Return Navigation object with the given name.
 
     Args:
         navigation_name:
@@ -32,7 +32,7 @@ def get_by_name(navigation_name):
 
 
 def upsert(navigation):
-    """ Save or Updates the Navigation object.
+    """Save or Updates the Navigation object.
 
     Args:
         Navigation object
@@ -44,7 +44,7 @@ def upsert(navigation):
 
 
 def create_navigation_tree_from_owl_file(owl_content):
-    """ Create Navigation associated to the ontology
+    """Create Navigation associated to the ontology
 
     Args:
         String object
@@ -60,7 +60,7 @@ def create_navigation_tree_from_owl_file(owl_content):
 
 
 def _create_navigation(tree):
-    """ Create navigation from the root element
+    """Create navigation from the root element
 
     Args:
         tree
@@ -81,7 +81,7 @@ def _create_navigation(tree):
 
 
 def _create_navigation_branches(tree, parent):
-    """ Create navigation branches
+    """Create navigation branches
 
     Args:
         tree, parent
@@ -92,17 +92,14 @@ def _create_navigation_branches(tree, parent):
 
     for name, values in tree.items():
         # create navigation
-        navigation = Navigation(
-            name=name,
-            parent=parent
-        )
+        navigation = Navigation(name=name, parent=parent)
         upsert(navigation)
 
         # generate children
-        children = _create_navigation_branches(values['children'], str(navigation.id))
+        children = _create_navigation_branches(values["children"], str(navigation.id))
 
         # update navigation
-        navigation.options = values['annotations']
+        navigation.options = values["annotations"]
         navigation.children = children
         upsert(navigation)
 
@@ -113,11 +110,11 @@ def _create_navigation_branches(tree, parent):
 
 
 def clean_navigation_objects():
-    """ Delete all Navigation objects from the Database
+    """Delete all Navigation objects from the Database
 
-        Args:
+    Args:
 
-        Returns:
+    Returns:
 
-        """
+    """
     return Navigation.delete_objects()

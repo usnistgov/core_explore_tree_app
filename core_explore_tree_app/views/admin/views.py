@@ -15,7 +15,10 @@ from core_cache_manager_app.views.admin.forms import FormSelectDatabaseObject
 from core_explore_tree_app.commons.enums import QueryOntologyStatus
 from core_explore_tree_app.components.navigation.models import Navigation
 from core_explore_tree_app.components.query_ontology.models import QueryOntology
-from core_explore_tree_app.views.admin.ajax import EditOntologyView, DeleteObjectModalView
+from core_explore_tree_app.views.admin.ajax import (
+    EditOntologyView,
+    DeleteObjectModalView,
+)
 from core_explore_tree_app.views.admin.forms import UploadQueryOntologyForm
 from core_main_app.commons import exceptions
 from core_main_app.utils.file import get_file_http_response
@@ -24,15 +27,15 @@ from core_main_app.views.common.views import read_xsd_file
 
 logger = logging.getLogger(__name__)
 
-html_tree_cache = caches['html_tree']
-navigation_cache = caches['navigation']
-leaf_cache = caches['leaf']
-link_cache = caches['link']
+html_tree_cache = caches["html_tree"]
+navigation_cache = caches["navigation"]
+leaf_cache = caches["leaf"]
+link_cache = caches["link"]
 
 
 @staff_member_required
 def manage_query_ontology(request):
-    """ View that allows ontology management.
+    """View that allows ontology management.
 
     Args:
         request:
@@ -44,25 +47,33 @@ def manage_query_ontology(request):
     ontologies = query_ontology_api.get_all()
 
     context = {
-        'object_name': 'OWL files',
-        'available': [ontology for ontology in ontologies if ontology.status != QueryOntologyStatus.disabled.value],
-        'disabled': [ontology for ontology in ontologies if ontology.status == QueryOntologyStatus.disabled.value],
-        'status': QueryOntologyStatus.__members__
+        "object_name": "OWL files",
+        "available": [
+            ontology
+            for ontology in ontologies
+            if ontology.status != QueryOntologyStatus.disabled.value
+        ],
+        "disabled": [
+            ontology
+            for ontology in ontologies
+            if ontology.status == QueryOntologyStatus.disabled.value
+        ],
+        "status": QueryOntologyStatus.__members__,
     }
 
     assets = {
         "js": [
             {
-                "path": 'core_explore_tree_app/admin/js/query_ontology/list/activate.js',
-                "is_raw": False
+                "path": "core_explore_tree_app/admin/js/query_ontology/list/activate.js",
+                "is_raw": False,
             },
             {
-                "path": 'core_explore_tree_app/admin/js/query_ontology/list/disable.js',
-                "is_raw": False
+                "path": "core_explore_tree_app/admin/js/query_ontology/list/disable.js",
+                "is_raw": False,
             },
             {
-                "path": 'core_explore_tree_app/admin/js/query_ontology/list/restore.js',
-                "is_raw": False
+                "path": "core_explore_tree_app/admin/js/query_ontology/list/restore.js",
+                "is_raw": False,
             },
             EditOntologyView.get_modal_js_path(),
             DeleteObjectModalView.get_modal_js_path(),
@@ -74,16 +85,18 @@ def manage_query_ontology(request):
         DeleteObjectModalView.get_modal_html_path(),
     ]
 
-    return admin_render(request,
-                        'core_explore_tree_app/admin/query_ontology/list.html',
-                        assets=assets,
-                        context=context,
-                        modals=modals)
+    return admin_render(
+        request,
+        "core_explore_tree_app/admin/query_ontology/list.html",
+        assets=assets,
+        context=context,
+        modals=modals,
+    )
 
 
 @staff_member_required
 def upload_query_ontology(request):
-    """ Upload ontology.
+    """Upload ontology.
 
     Args:
         request:
@@ -92,51 +105,52 @@ def upload_query_ontology(request):
 
     """
     assets = {
-        "js": [
-            {
-                "path": 'core_main_app/common/js/backtoprevious.js',
-                "is_raw": True
-            }
-        ]
+        "js": [{"path": "core_main_app/common/js/backtoprevious.js", "is_raw": True}]
     }
 
     context = {
-        'object_name': 'OWL files',
-        'url': reverse("admin:core_explore_tree_app_upload"),
-        'redirect_url': reverse("admin:core_explore_tree_app_query_ontology")
+        "object_name": "OWL files",
+        "url": reverse("admin:core_explore_tree_app_upload"),
+        "redirect_url": reverse("admin:core_explore_tree_app_query_ontology"),
     }
 
     # method is POST
-    if request.method == 'POST':
-        form = UploadQueryOntologyForm(request.POST, request.FILES)
-        context['upload_form'] = form
+    if request.method == "POST":
+        form = UploadQueryOntologyForm(request.POST, request.FILES, request=request)
+        context["upload_form"] = form
 
         if form.is_valid():
             try:
                 # save the query ontology
                 _save_query_ontology(request, context)
                 # redirect to the list of query ontology
-                return HttpResponseRedirect(reverse("admin:core_explore_tree_app_query_ontology"))
+                return HttpResponseRedirect(
+                    reverse("admin:core_explore_tree_app_query_ontology")
+                )
             except exceptions.NotUniqueError:
-                context['errors'] = html_escape("An Ontology with the same name already exists. "
-                                                "Please choose another name.")
+                context["errors"] = html_escape(
+                    "An Ontology with the same name already exists. "
+                    "Please choose another name."
+                )
             except Exception as e:
-                context['errors'] = html_escape(str(e))
+                context["errors"] = html_escape(str(e))
     # method is GET
     else:
         # render the form to upload a query ontology
-        context['upload_form'] = UploadQueryOntologyForm()
+        context["upload_form"] = UploadQueryOntologyForm(request=request)
 
     # render the upload page
-    return admin_render(request,
-                        'core_explore_tree_app/admin/query_ontology/upload.html',
-                        assets=assets,
-                        context=context)
+    return admin_render(
+        request,
+        "core_explore_tree_app/admin/query_ontology/upload.html",
+        assets=assets,
+        context=context,
+    )
 
 
 @staff_member_required
 def download_blank_query_ontology(request):
-    """ Download ontology.
+    """Download ontology.
 
     Args:
         request:
@@ -146,19 +160,21 @@ def download_blank_query_ontology(request):
 
     """
     # open the blank owl file
-    owl_file = open(finders.find('core_explore_tree_app/common/owl/blank.owl'))
+    owl_file = open(finders.find("core_explore_tree_app/common/owl/blank.owl"))
     # retrieve the content of it
     content = owl_file.read()
     # return the file
-    return get_file_http_response(file_content=content,
-                                  file_name='blank',
-                                  content_type="application/xml",
-                                  extension=".owl")
+    return get_file_http_response(
+        file_content=content,
+        file_name="blank",
+        content_type="application/xml",
+        extension=".owl",
+    )
 
 
 @staff_member_required
 def download_query_ontology(request, pk=None):
-    """ Download ontology.
+    """Download ontology.
 
     Args:
         request:
@@ -170,10 +186,12 @@ def download_query_ontology(request, pk=None):
     # get the ontology
     ontology = query_ontology_api.get_by_id(pk)
     # return the file
-    return get_file_http_response(file_content=ontology.content,
-                                  file_name=ontology.title,
-                                  content_type="application/xml",
-                                  extension=".owl")
+    return get_file_http_response(
+        file_content=ontology.content,
+        file_name=ontology.title,
+        content_type="application/xml",
+        extension=".owl",
+    )
 
 
 def _save_query_ontology(request, context):
@@ -187,14 +205,14 @@ def _save_query_ontology(request, context):
 
     """
     # get the schema name
-    name = request.POST['name']
+    name = request.POST["name"]
     # get the file from the form
-    owl_file = request.FILES['upload_file']
+    owl_file = request.FILES["upload_file"]
     # check the extension file
-    if not owl_file.name.endswith('.owl'):
-        raise Exception('The extension file must be .owl')
+    if not owl_file.name.endswith(".owl"):
+        raise Exception("The extension file must be .owl")
     # retrieve the template id
-    template_id = request.POST['templates_manager']
+    template_id = request.POST["templates_manager"]
     # read the content of the file
     # FIXME: this method should be renamed to read_file, can't be done in this commit
     owl_data = read_xsd_file(owl_file)
@@ -204,7 +222,7 @@ def _save_query_ontology(request, context):
 
 @staff_member_required
 def core_cache_view_index(request):
-    """ View that allows to see the cache status.
+    """View that allows to see the cache status.
 
     Args:
         request:
@@ -212,7 +230,7 @@ def core_cache_view_index(request):
     Returns:
 
     """
-    context = {'object_name': "Cache"}
+    context = {"object_name": "Cache"}
     error = None
 
     try:
@@ -244,41 +262,47 @@ def core_cache_view_index(request):
                 context["nodes"] = cache_list
                 context["number_cached_docs"] = number_cached_docs
     except exceptions.DoesNotExist:
-        error = {"error": "An Ontology should be active to explore. Please contact an admin."}
+        error = {
+            "error": "An Ontology should be active to explore. Please contact an admin."
+        }
     except Exception as e:
         error = {"error": "An error occurred when displaying the cache status."}
-        logger.error('ERROR : {0}'.format(str(e)))
+        logger.error("ERROR : {0}".format(str(e)))
 
     if error:
         context.update(error)
 
     assets = {}
     modals = []
-    return admin_render(request,
-                        'core_explore_tree_app/admin/cache/index.html',
-                        assets=assets,
-                        context=context,
-                        modals=modals)
+    return admin_render(
+        request,
+        "core_explore_tree_app/admin/cache/index.html",
+        assets=assets,
+        context=context,
+        modals=modals,
+    )
 
 
 @staff_member_required
 def core_cache_manager_index(request):
-    """ View to the Manual cache.
+    """View to the Manual cache.
 
-        Args:
-            request:
+    Args:
+        request:
 
-        Returns:
+    Returns:
 
     """
-    context = {'object_name': "Manual Cache"}
+    context = {"object_name": "Manual Cache"}
     error = None
 
     try:
         # get the active ontology
         active_ontology = query_ontology_api.get_active()
     except exceptions.DoesNotExist:
-        error = {"error": "An Ontology should be active to explore. Please contact an admin."}
+        error = {
+            "error": "An Ontology should be active to explore. Please contact an admin."
+        }
 
     if error is None:
         try:
@@ -293,7 +317,9 @@ def core_cache_manager_index(request):
                     html_tree = html_tree_cache.get(tree_key)
                     context["navigation_tree"] = html_tree
                 if navigation.children:
-                    context["children"] = [Navigation.get_by_id(child) for child in navigation.children]
+                    context["children"] = [
+                        Navigation.get_by_id(child) for child in navigation.children
+                    ]
             # Create the form to select which node to cache
             form = FormSelectDatabaseObject()
             form.set_objects(context["children"])
@@ -301,9 +327,11 @@ def core_cache_manager_index(request):
         except exceptions.DoesNotExist:
             error = {"error": "Error when retrieve the navigation's children."}
         except Exception as e:
-            error = {"error": "No navigation tree generated. "
-                              "Please go to the 'Data Exploration' menu to build the tree before using the cache."}
-            logger.error('ERROR : {0}'.format(str(e)))
+            error = {
+                "error": "No navigation tree generated. "
+                "Please go to the 'Data Exploration' menu to build the tree before using the cache."
+            }
+            logger.error("ERROR : {0}".format(str(e)))
 
     if error:
         context.update(error)
@@ -311,30 +339,30 @@ def core_cache_manager_index(request):
     assets = {
         "js": [
             {
-                "path": 'core_explore_tree_app/admin/js/cache/load_cache_view.js',
-                "is_raw": True
+                "path": "core_explore_tree_app/admin/js/cache/load_cache_view.js",
+                "is_raw": True,
             },
+            {"path": "core_explore_tree_app/user/js/tree.js", "is_raw": True},
             {
-                "path": 'core_explore_tree_app/user/js/tree.js',
-                "is_raw": True
+                "path": "core_explore_tree_app/user/js/resize_tree_panel.js",
+                "is_raw": True,
             },
-            {
-                "path": 'core_explore_tree_app/user/js/resize_tree_panel.js',
-                "is_raw": True
-            },
-            {
-                "path": 'core_explore_tree_app/user/js/mock.js',
-                "is_raw": True
-            },
+            {"path": "core_explore_tree_app/user/js/mock.js", "is_raw": True},
         ],
-        "css": ['core_explore_tree_app/user/css/tree.css',
-                'core_explore_tree_app/user/css/loading_background.css',
-                'core_explore_tree_app/admin/css/cache/style.css']
+        "css": [
+            "core_explore_tree_app/user/css/tree.css",
+            "core_explore_tree_app/user/css/loading_background.css",
+            "core_explore_tree_app/admin/css/cache/style.css",
+        ],
     }
-    modals = ['core_explore_tree_app/admin/cache/view/data_cache_popup.html',
-              'core_explore_tree_app/admin/cache/view/data_clear_cache_popup.html']
-    return admin_render(request,
-                        'core_explore_tree_app/admin/cache/manual_cache.html',
-                        assets=assets,
-                        context=context,
-                        modals=modals)
+    modals = [
+        "core_explore_tree_app/admin/cache/view/data_cache_popup.html",
+        "core_explore_tree_app/admin/cache/view/data_clear_cache_popup.html",
+    ]
+    return admin_render(
+        request,
+        "core_explore_tree_app/admin/cache/manual_cache.html",
+        assets=assets,
+        context=context,
+        modals=modals,
+    )

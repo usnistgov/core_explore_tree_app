@@ -24,16 +24,16 @@ from core_main_app.views.common.ajax import EditObjectModalView, DeleteObjectMod
 
 logger = logging.getLogger(__name__)
 
-html_tree_cache = caches['html_tree']
-navigation_cache = caches['navigation']
+html_tree_cache = caches["html_tree"]
+navigation_cache = caches["navigation"]
 
-leaf_cache = caches['leaf']
-branch_cache = caches['branch']
-link_cache = caches['link']
+leaf_cache = caches["leaf"]
+branch_cache = caches["branch"]
+link_cache = caches["link"]
 
 
 def disable_query_ontology(request):
-    """ Disable a query ontology
+    """Disable a query ontology
 
     Args:
         request:
@@ -42,15 +42,17 @@ def disable_query_ontology(request):
 
     """
     try:
-        query_ontology_api.edit_status(query_ontology_api.get_by_id(request.POST['id']),
-                                       QueryOntologyStatus.disabled.value)
-        return HttpResponse(json.dumps({}), content_type='application/javascript')
+        query_ontology_api.edit_status(
+            query_ontology_api.get_by_id(request.POST["id"]),
+            QueryOntologyStatus.disabled.value,
+        )
+        return HttpResponse(json.dumps({}), content_type="application/javascript")
     except Exception as e:
-        return HttpResponseBadRequest(str(e), content_type='application/javascript')
+        return HttpResponseBadRequest(str(e), content_type="application/javascript")
 
 
 def restore_query_ontology(request):
-    """ Restore a disabled query ontology
+    """Restore a disabled query ontology
 
     Args:
         request:
@@ -59,15 +61,17 @@ def restore_query_ontology(request):
 
     """
     try:
-        query_ontology_api.edit_status(query_ontology_api.get_by_id(request.POST['id']),
-                                       QueryOntologyStatus.uploaded.value)
-        return HttpResponse(json.dumps({}), content_type='application/javascript')
+        query_ontology_api.edit_status(
+            query_ontology_api.get_by_id(request.POST["id"]),
+            QueryOntologyStatus.uploaded.value,
+        )
+        return HttpResponse(json.dumps({}), content_type="application/javascript")
     except Exception as e:
-        return HttpResponseBadRequest(str(e), content_type='application/javascript')
+        return HttpResponseBadRequest(str(e), content_type="application/javascript")
 
 
 def activate_query_ontology(request):
-    """ activate a query ontology
+    """activate a query ontology
 
     Args:
         request:
@@ -76,62 +80,76 @@ def activate_query_ontology(request):
 
     """
     try:
-        query_ontology_api.edit_status(query_ontology_api.get_by_id(request.POST['id']),
-                                       QueryOntologyStatus.active.value)
-        return HttpResponse(json.dumps({}), content_type='application/javascript')
+        query_ontology_api.edit_status(
+            query_ontology_api.get_by_id(request.POST["id"]),
+            QueryOntologyStatus.active.value,
+        )
+        return HttpResponse(json.dumps({}), content_type="application/javascript")
     except Exception as e:
-        return HttpResponseBadRequest(str(e), content_type='application/javascript')
+        return HttpResponseBadRequest(str(e), content_type="application/javascript")
 
 
 class EditOntologyView(EditObjectModalView):
     form_class = EditOntologyForm
     model = QueryOntology
     success_url = reverse_lazy("admin:core_explore_tree_app_query_ontology")
-    success_message = 'Ontology edited with success.'
+    success_message = "Ontology edited with success."
 
     def _save(self, form):
         # Save treatment.
         try:
-            self.object.title = form.cleaned_data.get('title')
-            self.object.template = form.cleaned_data.get('template')
+            self.object.title = form.cleaned_data.get("title")
+            self.object.template = form.cleaned_data.get("template")
             query_ontology_api.upsert(self.object)
         except exceptions.NotUniqueError:
-            form.add_error(None, "An object with the same name already exists. Please choose "
-                                 "another name.")
+            form.add_error(
+                None,
+                "An object with the same name already exists. Please choose "
+                "another name.",
+            )
         except Exception as e:
             form.add_error(None, str(e))
 
     def get_initial(self):
         initial = super(EditOntologyView, self).get_initial()
-        initial['template'] = self.object.template.id
+        initial["template"] = self.object.template.id
         return initial
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(EditOntologyView, self).get_form_kwargs(*args, **kwargs)
+        kwargs["request"] = self.request
+        return kwargs
 
 
 class DeleteOntologyView(DeleteObjectModalView):
     model = QueryOntology
     success_url = reverse_lazy("admin:core_explore_tree_app_query_ontology")
-    success_message = 'Ontology deleted with success.'
-    field_for_name = 'title'
+    success_message = "Ontology deleted with success."
+    field_for_name = "title"
 
     def _delete(self, request, *args, **kwargs):
         # Delete treatment.
         query_ontology_api.delete(self.object)
 
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(DeleteOntologyView, self).get_form_kwargs(*args, **kwargs)
+        kwargs["request"] = self.request
+        return kwargs
+
 
 def core_cache_all_files(request):
-    """ Function that cache all files under the selected node.
+    """Function that cache all files under the selected node.
 
-        Args:
-            request:
+    Args:
+        request:
 
-        Returns:
+    Returns:
 
     """
     try:
         # cache all the files from the current node
         root_node_id = request.POST.get("node_id", None)
         root_node = Navigation.get_by_id(root_node_id)
-
         active_ontology = query_ontology_api.get_active()
         # get the navigation from the cache
         nav_key = str(active_ontology.id)
@@ -139,7 +157,6 @@ def core_cache_all_files(request):
         if nav_key in navigation_cache:
             navigation = navigation_cache.get(nav_key)
             nav_root_id = navigation.id
-
         dico_list = {}
         for navigation_id in root_node.children:
             leaves_nodes = []
@@ -153,22 +170,24 @@ def core_cache_all_files(request):
                     cache_docs_from_leaf(leaf_id, request, nav_root_id)
         else:
             cache_docs_from_leaf(root_node_id, request, nav_root_id)
-        message = Message(messages.SUCCESS, 'Documents cached with success.')
-        return HttpResponse(json.dumps({'message': message.message, 'tags': message.tags}),
-                            content_type='application/json')
+        message = Message(messages.SUCCESS, "Documents cached with success.")
+        return HttpResponse(
+            json.dumps({"message": message.message, "tags": message.tags}),
+            content_type="application/json",
+        )
     except:
-        message = Message(messages.ERROR, 'An error occurred while caching the files.')
-        return HttpResponseBadRequest(message, content_type='application/javascript')
+        message = Message(messages.ERROR, "An error occurred while caching the files.")
+        return HttpResponseBadRequest(message, content_type="application/javascript")
 
 
 def get_leafs_nodes(navigation_id, l):
-    """ Function that gets all leaves nodes under the current node.
+    """Function that gets all leaves nodes under the current node.
 
-        Args:
-            navigation_id: node ID
-            l: list
-        Returns:
-            list of leaves nodes for the current node
+    Args:
+        navigation_id: node ID
+        l: list
+    Returns:
+        list of leaves nodes for the current node
     """
     try:
         node = Navigation.get_by_id(navigation_id)
@@ -181,12 +200,12 @@ def get_leafs_nodes(navigation_id, l):
 
 
 def cache_docs_from_leaf(node_id, request, nav_root_id):
-    """ Function that build the files from the current node, cache them, create a DataCached objects and save them in the Database.
+    """Function that build the files from the current node, cache them, create a DataCached objects and save them in the Database.
 
-        Args:
-            request:
+    Args:
+        request:
 
-        Returns:
+    Returns:
 
     """
     leaves = Leaf.get_all()
@@ -199,9 +218,9 @@ def cache_docs_from_leaf(node_id, request, nav_root_id):
                 request2 = request
                 mutable = request2.POST._mutable
                 request2.POST._mutable = True
-                request2.POST['nav_id'] = nav_root_id
-                request2.POST['doc_id'] = doc_id
-                request2.POST['node_id'] = leaf.current_node_id
+                request2.POST["nav_id"] = nav_root_id
+                request2.POST["doc_id"] = doc_id
+                request2.POST["node_id"] = leaf.current_node_id
                 request2.POST._mutable = mutable
                 load_view(request2)
 
@@ -219,5 +238,8 @@ def core_clear_cache(request):
     branch_cache.clear()
     link_cache.clear()
 
-    message = Message(messages.SUCCESS, 'Cached objects deleted with success.')
-    return HttpResponse(json.dumps({'message': message.message, 'tags': message.tags}), content_type='application/json')
+    message = Message(messages.SUCCESS, "Cached objects deleted with success.")
+    return HttpResponse(
+        json.dumps({"message": message.message, "tags": message.tags}),
+        content_type="application/json",
+    )

@@ -4,7 +4,7 @@ from core_explore_tree_app.components.leaf.models import Leaf
 
 
 def update_docs_list(leaf, doc_id):
-    """ Save or Updates the list of docs under the leaf.
+    """Save or Updates the list of docs under the leaf.
 
     Args:
         Leaf object
@@ -18,7 +18,7 @@ def update_docs_list(leaf, doc_id):
 
 
 def upsert(leaf):
-    """ Save or Updates the Leaf object.
+    """Save or Updates the Leaf object.
 
     Args:
         Leaf object
@@ -30,15 +30,15 @@ def upsert(leaf):
 
 
 def upsert_leaf_object(node_id, doc_id):
-    """ Create or Updates the Leaf object.
+    """Create or Updates the Leaf object.
 
-        Args:
-            node_id: represents the id of the Leaf node
-            doc_id: id of document under the current leaf in the tree
+    Args:
+        node_id: represents the id of the Leaf node
+        doc_id: id of document under the current leaf in the tree
 
-        Returns:
+    Returns:
 
-        """
+    """
     try:
         leaf = get_by_current_node_id(node_id)
         # if leaf already exists in the DB => add to the list of the docs under this leaf id of the current doc
@@ -51,7 +51,7 @@ def upsert_leaf_object(node_id, doc_id):
 
 
 def get_by_current_node_id(leaf_id):
-    """ Return the object with the given id
+    """Return the object with the given id
     Args:
      leaf_id:
     Return:
@@ -61,9 +61,9 @@ def get_by_current_node_id(leaf_id):
 
 
 def clean_leaves_objects():
-    """ Remove all Leaf objects from the database.
+    """Remove all Leaf objects from the database.
 
-        Returns:
+    Returns:
 
     """
     return Leaf.delete_objects()

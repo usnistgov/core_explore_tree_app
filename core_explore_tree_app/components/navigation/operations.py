@@ -9,7 +9,7 @@ CQL_NAMESPACE = "http://siam.nist.gov/Database-Navigation-Ontology#"
 
 
 def retrieve_navigation_filters(navigation_node):
-    """ retrieve filters from a navigation node
+    """retrieve filters from a navigation node
 
     Parameters
         navigation_node:
@@ -22,8 +22,11 @@ def retrieve_navigation_filters(navigation_node):
     # If no parent, stops the filter lookup
     while node_has_parent:
         # Add filter to the list of filters
-        if 'filter' in navigation_node.options and navigation_node.options['filter'] is not None:
-            filters.append(navigation_node.options['filter'])
+        if (
+            "filter" in navigation_node.options
+            and navigation_node.options["filter"] is not None
+        ):
+            filters.append(navigation_node.options["filter"])
 
         # Update parameters
         node_has_parent = navigation_node.parent is not None
@@ -35,7 +38,7 @@ def retrieve_navigation_filters(navigation_node):
 
 
 def get_navigation_node_by_name(root_id, node_name):
-    """ Get the navigation node from a given node name
+    """Get the navigation node from a given node name
 
     Args:
         root_id:
@@ -54,8 +57,13 @@ def get_navigation_node_by_name(root_id, node_name):
     if len(navigation_root_node.children) == 0:
         return None
 
-    children_nodes = [get_navigation_node_by_name(child, node_name) for child in navigation_root_node.children]
-    children_nodes = [child_node for child_node in children_nodes if child_node is not None]
+    children_nodes = [
+        get_navigation_node_by_name(child, node_name)
+        for child in navigation_root_node.children
+    ]
+    children_nodes = [
+        child_node for child_node in children_nodes if child_node is not None
+    ]
 
     if len(children_nodes) != 1:
         return None
@@ -64,7 +72,7 @@ def get_navigation_node_by_name(root_id, node_name):
 
 
 def get_navigation_node_for_document(node_id, document_id):
-    """ Get the navigation node from a given data id
+    """Get the navigation node from a given data id
 
     Args:
         node_id:
@@ -76,7 +84,10 @@ def get_navigation_node_for_document(node_id, document_id):
     navigation_node = navigation_api.get_by_id(node_id)
     original_node = navigation_api.get_by_id(node_id)
 
-    if "projection" in navigation_node.options and navigation_node.options['projection'] is not None:
+    if (
+        "projection" in navigation_node.options
+        and navigation_node.options["projection"] is not None
+    ):
         # **************
         # FIXME duplicate of parser code
         # Get projection
@@ -84,8 +95,11 @@ def get_navigation_node_for_document(node_id, document_id):
         filters = []
         while True:
             # add filter to the list of filters
-            if 'filter' in navigation_node.options and navigation_node.options['filter'] is not None:
-                filters.append(navigation_node.options['filter'])
+            if (
+                "filter" in navigation_node.options
+                and navigation_node.options["filter"] is not None
+            ):
+                filters.append(navigation_node.options["filter"])
 
             # if no parent, stops the filter lookup
             if navigation_node.parent is None:
@@ -97,9 +111,10 @@ def get_navigation_node_for_document(node_id, document_id):
         doc = Data.get_by_id(document_id)
         template_id = doc.template.id
 
-        documents_id = [str(get_projection(document)) for document in query.execute_query(template_id,
-                                                                                          filters,
-                                                                                          '{"id": 1}')]
+        documents_id = [
+            str(get_projection(document))
+            for document in query.execute_query(template_id, filters, '{"id": 1}')
+        ]
         #  End fixme
         # **************
 
@@ -114,9 +129,13 @@ def get_navigation_node_for_document(node_id, document_id):
         if len(navigation_children) == 0:
             return None
         else:
-            navigation_nodes = [get_navigation_node_for_document(child_id, document_id)
-                                for child_id in navigation_children]
-            navigation_nodes = [nav_node for nav_node in navigation_nodes if nav_node is not None]
+            navigation_nodes = [
+                get_navigation_node_for_document(child_id, document_id)
+                for child_id in navigation_children
+            ]
+            navigation_nodes = [
+                nav_node for nav_node in navigation_nodes if nav_node is not None
+            ]
 
             if len(navigation_nodes) != 1:
                 return None

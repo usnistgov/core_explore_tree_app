@@ -10,17 +10,21 @@ from core_main_app.components.template.models import Template
 
 
 class QueryOntology(Document):
-    """ Ontology of queries to generate the navigation tree
-    """
-    title = fields.StringField(unique=True, blank=False, validation=not_empty_or_whitespaces)
-    status = fields.IntField(default=0, blank=False)  # 0: Uploaded; 1: Active; 2: Blank; -1: Deleted
+    """Ontology of queries to generate the navigation tree"""
+
+    title = fields.StringField(
+        unique=True, blank=False, validation=not_empty_or_whitespaces
+    )
+    status = fields.IntField(
+        default=0, blank=False
+    )  # 0: Uploaded; 1: Active; 2: Blank; -1: Deleted
     last_modification_date = fields.DateTimeField(blank=True)
     content = fields.StringField(blank=False)
     template = fields.ReferenceField(Template, blank=True)
 
     @staticmethod
     def get_all():
-        """ Get all Query Ontology.
+        """Get all Query Ontology.
 
         Returns:
 
@@ -29,7 +33,7 @@ class QueryOntology(Document):
 
     @staticmethod
     def get_by_status(status):
-        """ Get all Query Ontology with the given status.
+        """Get all Query Ontology with the given status.
 
         Args:
             status:
@@ -41,7 +45,7 @@ class QueryOntology(Document):
 
     @staticmethod
     def get_active():
-        """ Return the only active ontology
+        """Return the only active ontology
 
         Returns:
 
@@ -55,7 +59,7 @@ class QueryOntology(Document):
 
     @staticmethod
     def get_by_id(query_ontology_id):
-        """ Return the object with the given id.
+        """Return the object with the given id.
 
         Args:
             query_ontology_id:
@@ -72,7 +76,7 @@ class QueryOntology(Document):
             raise exceptions.ModelError(str(ex))
 
     def save_object(self):
-        """ Custom save.
+        """Custom save.
 
         Returns:
             Saved Instance.

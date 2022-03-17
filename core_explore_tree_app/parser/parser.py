@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from xml_utils.xsd_tree.xsd_tree import XSDTree
+
 # from lxml import etree
 # TODO :refactor etree function in xml_utils
 
@@ -13,7 +14,7 @@ CQL_NAMESPACE = "{http://siam.nist.gov/Database-Navigation-Ontology#cql:}"  # FI
 
 
 def parse_ontology(ontology):
-    """ Create Navigation associated to the ontology
+    """Create Navigation associated to the ontology
 
     Args:
         String/unicode object
@@ -28,7 +29,7 @@ def parse_ontology(ontology):
 
 
 def generate_classes(owl_tree):
-    """ Parse OWL Classes
+    """Parse OWL Classes
     Args:
         owl_tree: Element tree
 
@@ -46,9 +47,9 @@ def generate_classes(owl_tree):
     owl_annotations = owl_tree.findall("{}AnnotationProperty".format(OWL_NAMESPACE))
 
     for owl_annotation in owl_annotations:
-        annotation = owl_annotation.attrib['{}about'.format(RDF_NAMESPACE)]
+        annotation = owl_annotation.attrib["{}about".format(RDF_NAMESPACE)]
         try:
-            annotation_name = annotation.split(':')[-1]
+            annotation_name = annotation.split(":")[-1]
         except Exception as exc:
             annotation_name = annotation
 
@@ -60,18 +61,18 @@ def generate_classes(owl_tree):
 
         # Top level if not subclass of other class
         if len(owl_subclasses) == 0:
-            owl_class_name = owl_class.attrib['{}about'.format(RDF_NAMESPACE)]
+            owl_class_name = owl_class.attrib["{}about".format(RDF_NAMESPACE)]
 
             classes[owl_class_name] = {
                 "annotations": get_class_annotations(owl_class, annotations),
-                "children": generate_subclasses(owl_tree, owl_class_name, annotations)
+                "children": generate_subclasses(owl_tree, owl_class_name, annotations),
             }
 
     return classes
 
 
 def generate_subclasses(owl_tree, base_class_name, annotations):
-    """ Parse OWL Subclasses
+    """Parse OWL Subclasses
     Args:
         owl_tree: Element tree
         base_class_name:  String
@@ -82,22 +83,24 @@ def generate_subclasses(owl_tree, base_class_name, annotations):
     subclasses = OrderedDict()
     # TODO: use XSDTree
     owl_classes = owl_tree.findall("{}Class".format(OWL_NAMESPACE))
-    #owl_classes = XSDTree.findall(owl_tree, "{}Class".format(OWL_NAMESPACE))
+    # owl_classes = XSDTree.findall(owl_tree, "{}Class".format(OWL_NAMESPACE))
     for owl_class in owl_classes:
         # TODO: use XSDTree
         owl_subclasses = owl_class.findall("{}subClassOf".format(RDFS_NAMESPACE))
-        #owl_subclasses = XSDTree.findall(owl_class, "{}subClassOf".format(RDFS_NAMESPACE))
+        # owl_subclasses = XSDTree.findall(owl_class, "{}subClassOf".format(RDFS_NAMESPACE))
         # Test if subclass of other class
         if len(owl_subclasses) > 0:
             for owl_subclass in owl_subclasses:
-                resource_name = owl_subclass.attrib['{}resource'.format(RDF_NAMESPACE)]
+                resource_name = owl_subclass.attrib["{}resource".format(RDF_NAMESPACE)]
 
                 if resource_name == base_class_name:
-                    class_name = owl_class.attrib['{}about'.format(RDF_NAMESPACE)]
+                    class_name = owl_class.attrib["{}about".format(RDF_NAMESPACE)]
 
                     subclasses[class_name] = {
                         "annotations": get_class_annotations(owl_class, annotations),
-                        'children': generate_subclasses(owl_tree, class_name, annotations)
+                        "children": generate_subclasses(
+                            owl_tree, class_name, annotations
+                        ),
                     }
 
                     break
@@ -106,7 +109,7 @@ def generate_subclasses(owl_tree, base_class_name, annotations):
 
 
 def get_class_annotations(owl_class, annotations):
-    """ Return annotations found in the class
+    """Return annotations found in the class
 
     Args:
         owl_class: owl class to look in (Element tree)
@@ -120,9 +123,8 @@ def get_class_annotations(owl_class, annotations):
     for annotation in annotations:
         # TODO: use XSDTree
         class_annotation = owl_class.find("{0}{1}".format(CQL_NAMESPACE, annotation))
-        #class_annotation = XSDTree.iterfind(owl_class, "{0}{1}".format(CQL_NAMESPACE, annotation))
+        # class_annotation = XSDTree.iterfind(owl_class, "{0}{1}".format(CQL_NAMESPACE, annotation))
         if class_annotation is not None:
             class_annotations[annotation] = class_annotation.text
 
     return class_annotations
-

@@ -12,7 +12,9 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from core_explore_tree_app.components.data import query
 from core_explore_tree_app.components.navigation import api as navigation_api
-from core_explore_tree_app.components.navigation import operations as navigation_operations
+from core_explore_tree_app.components.navigation import (
+    operations as navigation_operations,
+)
 from core_explore_tree_app.parser import processview as parser_processview
 from core_explore_tree_app.utils.dict import *
 from core_explore_tree_app.utils.queryNode import queryNode
@@ -23,14 +25,14 @@ from xml_utils.xsd_tree.xsd_tree import XSDTree
 from core_cache_manager_app.components.data_cached.models import DataCached
 from core_cache_manager_app.components.data_cached import api as data_cached_api
 
-leaf_cache = caches['leaf']
-branch_cache = caches['branch']
-link_cache = caches['link']
+leaf_cache = caches["leaf"]
+branch_cache = caches["branch"]
+link_cache = caches["link"]
 
 
 @cache_page(600 * 15)
 def load_view(request):
-    """ Load view entry point
+    """Load view entry point
 
     Args:
         request:
@@ -43,10 +45,10 @@ def load_view(request):
         error = {"message": "Request is malformed. nav_id is mandatory"}
         return HttpResponse(json.dumps(error), status=HTTP_400_BAD_REQUEST)
     # retrieve all the parameters from the request
-    nav_id = request.POST.get('nav_id', None)
-    node_id = request.POST.get('node_id', None)
-    doc_id = request.POST.get('doc_id', None)
-    ref_node_id = request.POST.get('ref_node_id', None)
+    nav_id = request.POST.get("nav_id", None)
+    node_id = request.POST.get("node_id", None)
+    doc_id = request.POST.get("doc_id", None)
+    ref_node_id = request.POST.get("ref_node_id", None)
     load_doc = None
     # Get all DataCached objects:
     alldatacached = DataCached.get_all()
@@ -59,7 +61,7 @@ def load_view(request):
     # click on a document in the tree
     if node_id is not None and doc_id is not None:
         node_name = get_node_name(node_id)
-        id_docleaf_cached = str(node_name) + '_' + str(doc_id)
+        id_docleaf_cached = str(node_name) + "_" + str(doc_id)
         # Get the document from the cache if this one had ever been accessed
         for key, value in list(listof.items()):
             if id_docleaf_cached == key:
@@ -88,8 +90,6 @@ def load_view(request):
             dict_key_docid[id_docleaf_cached] = id_docleaf_cached
             data_cached_api.upsert_data_cache_object(node_name, doc, dict_key_docid)
 
-
-
     # click on a node in the tree
     elif node_id is not None:
         if node_id in branch_cache:
@@ -101,15 +101,17 @@ def load_view(request):
     # click on a link in a document (build id)
     elif ref_node_id is not None and doc_id is not None:
         navigation_node = None
-        id_doclink_cached = ref_node_id + '_' + doc_id
+        id_doclink_cached = ref_node_id + "_" + doc_id
         # The file was cached by clicking a link from a document
         if id_doclink_cached in list(listof.keys()) or id_doclink_cached in link_cache:
             load_doc = link_cache.get(id_doclink_cached)
         else:
-            navigation_node = navigation_operations.get_navigation_node_for_document(ref_node_id, doc_id)
+            navigation_node = navigation_operations.get_navigation_node_for_document(
+                ref_node_id, doc_id
+            )
             nodename = navigation_node.name
             nodename_index = nodename.find("#")
-            node_name = nodename[nodename_index + 1:]
+            node_name = nodename[nodename_index + 1 :]
             id_doc_cached = node_name + "_" + str(doc_id)
             # The file was cached by using the cache manager tool
             if id_doc_cached in list(listof.keys()):
@@ -118,7 +120,11 @@ def load_view(request):
         if not load_doc:
             # The file was never cached
             if not navigation_node:
-                navigation_node = navigation_operations.get_navigation_node_for_document(ref_node_id, doc_id)
+                navigation_node = (
+                    navigation_operations.get_navigation_node_for_document(
+                        ref_node_id, doc_id
+                    )
+                )
             load_doc = _load_data_view(navigation_node.id, nav_id, doc_id)
             link_cache.set(id_doclink_cached, load_doc)
 
@@ -133,11 +139,13 @@ def load_view(request):
         return HttpResponse(json.dumps(error), status=HTTP_400_BAD_REQUEST)
 
     if load_doc is not None:
-        return render(request, "core_explore_tree_app/user/explore_tree/view.html", load_doc)
+        return render(
+            request, "core_explore_tree_app/user/explore_tree/view.html", load_doc
+        )
 
 
 def _load_branch_view(request):
-    """ Load view for a branch
+    """Load view for a branch
 
     Args:
         request:
@@ -157,25 +165,25 @@ def _load_branch_view(request):
         documents.append(query_doc.id)
     # Display XML file if "projection_view" annotation is not configured
     if "view" not in navigation_node.options:
-        error = {
-            "message": "'cql:view' annotation does not exist for this branch."
-        }
+        error = {"message": "'cql:view' annotation does not exist for this branch."}
 
         return HttpResponse(json.dumps(error), HTTP_400_BAD_REQUEST)
 
     branch_views = json.loads(navigation_node.options["view"])
 
-    name = navigation_node.name.split('#')[1] if '#' in navigation_node.name else navigation_node.name
-    view_data = {
-        "header": name,
-        "type": "branch",
-        "views": []
-    }
+    name = (
+        navigation_node.name.split("#")[1]
+        if "#" in navigation_node.name
+        else navigation_node.name
+    )
+    view_data = {"header": name, "type": "branch", "views": []}
 
     for branch_view in branch_views:
         result_data = {
             "title": branch_view["title"],
-            "data": parser_processview.processviewdocidlist(request.POST["nav_id"], documents, branch_view["data"])
+            "data": parser_processview.processviewdocidlist(
+                request.POST["nav_id"], documents, branch_view["data"]
+            ),
         }
 
         view_data["views"].append(result_data)
@@ -184,7 +192,7 @@ def _load_branch_view(request):
 
 
 def _load_data_view(node_id, nav_id, data_id, from_tree=True):
-    """ Load view for a data, from a tree or a link
+    """Load view for a data, from a tree or a link
 
     Args:
         node_id:
@@ -196,7 +204,9 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
 
     """
     if not from_tree:
-        navigation_node = navigation_operations.get_navigation_node_for_document(node_id, data_id)
+        navigation_node = navigation_operations.get_navigation_node_for_document(
+            node_id, data_id
+        )
     else:
         navigation_node = navigation_api.get_by_id(node_id)
 
@@ -208,8 +218,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
         "header": xml_document.title,
         "type": "leaf",
         "views": [],
-        "download": []
-
+        "download": [],
     }
     # Initialize parameters in order to download later some information
     # dict of doc_id and queries done of cross documents : {id_doc1: [list of queries1], id_doc2: [list of queries2]}
@@ -225,10 +234,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
 
     # Send the annotation to the processor and collect the data
     for projection_view in projection_views:
-        result_data = {
-            "title": projection_view["title"],
-            "data": None
-        }
+        result_data = {"title": projection_view["title"], "data": None}
 
         # FIXME better handling of x-queries
         # Get info from other doc (without the main queried document)
@@ -236,19 +242,16 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
             doc_projections = []
             # Get the names of the tags tag need to be displayed
             for value in projection_view["data"]:
-                doc_projections.append(value.get('path'))
+                doc_projections.append(value.get("path"))
 
-            result_data["data"] = parser_processview.process_cross_query(nav_id,
-                                                                         data_id,
-                                                                         projection_view["query"],
-                                                                         projection_view["data"])
+            result_data["data"] = parser_processview.process_cross_query(
+                nav_id, data_id, projection_view["query"], projection_view["data"]
+            )
             # Get all the queried documents (without the main queried document)
             queried_docs = parser_processview.ids_docs_to_querys
 
             for id_doc in queried_docs:
-                other_doc_query = {
-                    "_id": ObjectId(id_doc)
-                }
+                other_doc_query = {"_id": ObjectId(id_doc)}
                 # list of queries done on the current document
                 query_list = list()
                 # list of queries results done on the current document
@@ -256,20 +259,24 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                 for projection in doc_projections:
                     # Get the MongoDB query path for the parameter that need to be displayed
                     # eg: query_path = dict_content.a.b.c.d.e
-                    query_path = {
-                        doc_projections[doc_projections.index(projection)]: 1
-                    }
+                    query_path = {doc_projections[doc_projections.index(projection)]: 1}
                     # Get the Data corresponding to the id
-                    queried_data = Data.execute_query(other_doc_query, []).only(list(query_path.keys())[0])
+                    queried_data = Data.execute_query(other_doc_query, []).only(
+                        list(query_path.keys())[0]
+                    )
                     # Add the query to the query list for the current doc
-                    query_list.append(list(query_path.keys())[0].replace("dict_content.", ""))
+                    query_list.append(
+                        list(query_path.keys())[0].replace("dict_content.", "")
+                    )
                     try:
                         # Get the result of the query
                         result_query = get_projection(queried_data[0])
                         # Add the result of the query to the result list for the current doc
                         result_list.append(str(result_query))
                     except Exception as e:
-                        logger.warning("_load_data_view threw an exception: {0}".format(str(e)))
+                        logger.warning(
+                            "_load_data_view threw an exception: {0}".format(str(e))
+                        )
 
                 dict_id_and_queries_cross_docs[id_doc] = query_list
                 dict_id_and_queryresults_cross_docs[id_doc] = result_list
@@ -277,10 +284,15 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
         else:
             # list of queries done on the current document (Main doc)
             query_list = []
-            doc_projections = [value.get('path') for value in projection_view["data"]]
-            query_list = [doc_projections[doc_projections.index(projection)] for projection in doc_projections]
+            doc_projections = [value.get("path") for value in projection_view["data"]]
+            query_list = [
+                doc_projections[doc_projections.index(projection)]
+                for projection in doc_projections
+            ]
             # Get all results of the queries. type(result_data["data"]) = dict or instance of dict
-            result_data["data"] = parser_processview.processview(nav_id, data_id, projection_view["data"])
+            result_data["data"] = parser_processview.processview(
+                nav_id, data_id, projection_view["data"]
+            )
 
             for query_path, dict_result in zip(query_list, result_data["data"]):
                 # eg: query_path = a.b.c.d
@@ -293,16 +305,25 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                         if isinstance(v, list):
                             dict_tags_values_main_doc[tag].append(dict_result_value)
                         else:
-                            dict_tags_values_main_doc[tag] = [dict_tags_values_main_doc[tag], dict_result_value]
+                            dict_tags_values_main_doc[tag] = [
+                                dict_tags_values_main_doc[tag],
+                                dict_result_value,
+                            ]
                     else:
                         dict_tags_values_main_doc[tag] = dict_result_value
 
                 # We have multiple values for this result: all the chemical components
                 # (dict_result[key] is an inclusion of dicts)
-                dict_result_item, dict_result_items = [dict_result.get(_, None) for _ in ["item", "items"]]
+                dict_result_item, dict_result_items = [
+                    dict_result.get(_, None) for _ in ["item", "items"]
+                ]
 
                 if dict_result_item or dict_result_items:
-                    dict_result_item_v = dict_result_item if dict_result_item is not None else dict_result_items
+                    dict_result_item_v = (
+                        dict_result_item
+                        if dict_result_item is not None
+                        else dict_result_items
+                    )
                     # dict_result_item_v = [dict_result_item, dict_result_items][dict_result_item not None]
                     # From the inclusion of dict, process the dict into a list and get all the needed values
                     # values_of_items_from_main_doc = list[list[value1 for dict i,value2 for dict 2, ..]]
@@ -316,7 +337,9 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                             # eg : ["Build location X", "59"]
                             if len(value) == 2:
                                 # list_tag_of_items_from_main_doc.append(value[0])
-                                list_values_of_items_from_main_doc.append(value[1])  # Get the value. eg: 59
+                                list_values_of_items_from_main_doc.append(
+                                    value[1]
+                                )  # Get the value. eg: 59
                             # We have only one value (last value in the list. eg: EWI_Build1 in l1)
                             else:
                                 list_values_of_items_from_main_doc.append(value)
@@ -336,7 +359,9 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
         # results = ["D","E","G"]
         results = dict_id_and_queryresults_cross_docs[key]
         # Build a xml string for the doc associated to doc_id thanks to the list of queries and the result list
-        xml_string = queryNode.tree_to_xml_string(queryNode.aggregate_query(query_list, results))
+        xml_string = queryNode.tree_to_xml_string(
+            queryNode.aggregate_query(query_list, results)
+        )
         xml_object = XSDTree.fromstring(xml_string + "</data>")
         # Add the XML part to create an XML resulting of tag and values of crossed documents
         xml_cross_queries_string += XSDTree.tostring(xml_object, pretty=True)
@@ -350,12 +375,14 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
     # Transform all the result value into a string to help while testing equality of values with the original XML
     for key, value in list(dict_tags_values_main_doc.items()):
         if isinstance(value, list):
-            dict_tags_values_main_doc[key] = [x if isinstance(x, str) else str(x) for x in value]
+            dict_tags_values_main_doc[key] = [
+                x if isinstance(x, str) else str(x) for x in value
+            ]
         else:
             try:
                 dict_tags_values_main_doc[key] = str(value)
             except:
-                dict_tags_values_main_doc[key] = u''.join(value).encode('utf-8')
+                dict_tags_values_main_doc[key] = u"".join(value).encode("utf-8")
         v = dict_tags_values_main_doc[key]
 
     # Process the XML structure that represents the main document to keep only the needed tags and information
@@ -364,7 +391,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
         try:
             text = str(child.text)
         except:
-            text = u''.join(child.text).encode('utf-8')
+            text = u"".join(child.text).encode("utf-8")
         # If the xml tag is in our dict of tags and values from the main document
         # and its value = dict_tags_values_main_doc[child.tag] we keep the text in the XML structure
         # else we remove the text
@@ -379,7 +406,10 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
                 if not display_value:
                     child.text = ""
             else:
-                if text == str(dict_tags_values_main_doc[child.tag]) or dict_tags_values_main_doc[child.tag] in text:
+                if (
+                    text == str(dict_tags_values_main_doc[child.tag])
+                    or dict_tags_values_main_doc[child.tag] in text
+                ):
                     logger.info("_load_data_view: log silent if")
                 else:
                     child.text = ""
@@ -426,14 +456,14 @@ def download_displayed_data(request):
 
     """
     # retrieve all the parameters from the request
-    node_id = request.GET.get('current_node', None)
-    doc_id = request.GET.get('doc_id', None)
-    file_name = request.GET.get('file_name', None)
+    node_id = request.GET.get("current_node", None)
+    doc_id = request.GET.get("doc_id", None)
+    file_name = request.GET.get("file_name", None)
     load_doc = {}
     if node_id is not None and doc_id is not None:
         node_name = get_node_name(node_id)
-        id_leafdoc = str(node_name) + '_' + str(doc_id)
-        id_linkdoc = node_id + '_' + doc_id
+        id_leafdoc = str(node_name) + "_" + str(doc_id)
+        id_linkdoc = node_id + "_" + doc_id
         # Get the document from the cache
         # The doc had been reached initially from a link
         if id_linkdoc in link_cache:
@@ -443,10 +473,12 @@ def download_displayed_data(request):
             load_doc = leaf_cache.get(id_leafdoc)
         # The doc had been cached by the admin
         else:
-            navigation_node = navigation_operations.get_navigation_node_for_document(node_id, doc_id)
+            navigation_node = navigation_operations.get_navigation_node_for_document(
+                node_id, doc_id
+            )
             nodename = navigation_node.name
             nodename_index = nodename.find("#")
-            node_name = nodename[nodename_index + 1:]
+            node_name = nodename[nodename_index + 1 :]
             id_doc_cached = node_name + "_" + str(doc_id)
             listof = {}
             alldatacached = DataCached.get_all()
@@ -457,10 +489,12 @@ def download_displayed_data(request):
             if id_doc_cached in listof.keys():
                 load_doc = leaf_cache.get(str(listof[id_doc_cached]))
 
-    return get_file_http_response(file_content=load_doc["download"],
-                                  file_name=file_name,
-                                  content_type="text/xml",
-                                  extension="xml")
+    return get_file_http_response(
+        file_content=load_doc["download"],
+        file_name=file_name,
+        content_type="text/xml",
+        extension="xml",
+    )
 
 
 def download_source_file(request):
@@ -472,16 +506,18 @@ def download_source_file(request):
     Returns:
 
     """
-    doc_id = request.GET.get('doc_id', None)
+    doc_id = request.GET.get("doc_id", None)
     data = Data.get_by_id(doc_id)
-    return get_file_http_response(file_content=data.xml_content,
-                                  file_name=data.title,
-                                  content_type="text/xml",
-                                  extension="xml")
+    return get_file_http_response(
+        file_content=data.xml_content,
+        file_name=data.title,
+        content_type="text/xml",
+        extension="xml",
+    )
 
 
 def get_node_name(node_id):
-    """ Get the name of the node
+    """Get the name of the node
 
     Args:
         node_id:
@@ -491,4 +527,4 @@ def get_node_name(node_id):
     """
     navigation_name = navigation_api.get_by_id(node_id).name
     index = navigation_name.rfind("#")
-    return navigation_name[index + 1:]
+    return navigation_name[index + 1 :]

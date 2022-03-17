@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_values_items(dict_structure, values):
-    """ Get all values from an inclusion of dictionaries
+    """Get all values from an inclusion of dictionaries
 
     Args:
         dict_structure: inclusion of dictionnary
@@ -17,7 +17,7 @@ def get_values_items(dict_structure, values):
         list
     """
     for element in dict_structure:
-        if element is dict or isinstance(element,dict):
+        if element is dict or isinstance(element, dict):
             list_items_values = []
             for key in element:
                 if "item" in str(key):  # We have an inclusion of dict
@@ -30,7 +30,7 @@ def get_values_items(dict_structure, values):
 
 
 def check_empty_nodes(xml):
-    """ Check if there are empty leafs in an XML tree (all child where child.text="")
+    """Check if there are empty leafs in an XML tree (all child where child.text="")
 
     Args:
         xml:
@@ -49,7 +49,7 @@ def check_empty_nodes(xml):
 
 
 def remove_empty_nodes(xml):
-    """ Remove empty leafs of the tree (all child where child.text="")
+    """Remove empty leafs of the tree (all child where child.text="")
 
     Args:
         xml:
@@ -67,4 +67,6 @@ def remove_empty_nodes(xml):
                     parent = child.findall("..")
                     parent[0].remove(child)
                 except Exception as e:
-                    logger.warning("remove_empty_nodes threw an exception: {0}".format(str(e)))
+                    logger.warning(
+                        "remove_empty_nodes threw an exception: {0}".format(str(e))
+                    )

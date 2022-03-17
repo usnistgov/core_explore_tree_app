@@ -1,4 +1,4 @@
-Django==2.2.10
-django-mongoengine==0.3.3
+Django
+django-mongoengine
+djangorestframework
 enum34==1.1.6
-djangorestframework==3.9.1

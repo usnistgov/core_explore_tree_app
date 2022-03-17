@@ -5,7 +5,7 @@ from core_explore_tree_app.components.query_ontology.models import QueryOntology
 
 
 def upsert(query_ontology):
-    """ Save or Updates the Query Ontology.
+    """Save or Updates the Query Ontology.
 
     Args:
         query_ontology:
@@ -17,7 +17,7 @@ def upsert(query_ontology):
 
 
 def delete(ontology):
-    """ Delete an Ontology
+    """Delete an Ontology
 
     Args:
         ontology:
@@ -27,7 +27,7 @@ def delete(ontology):
 
 
 def get_by_id(query_ontology_id):
-    """ Return QueryOntology object with the given id.
+    """Return QueryOntology object with the given id.
 
     Args:
         query_ontology_id:
@@ -39,7 +39,7 @@ def get_by_id(query_ontology_id):
 
 
 def get_by_status(status):
-    """ Return QueryOntology object list with the given status.
+    """Return QueryOntology object list with the given status.
 
     Args:
         status:
@@ -51,7 +51,7 @@ def get_by_status(status):
 
 
 def get_active():
-    """ Return the only active ontology
+    """Return the only active ontology
 
     Returns:
 
@@ -60,7 +60,7 @@ def get_active():
 
 
 def get_all():
-    """ Get all the QueryOntology.
+    """Get all the QueryOntology.
 
     Returns: QueryOntology collection
 
@@ -69,7 +69,7 @@ def get_all():
 
 
 def edit_status(ontology, status):
-    """ Edit status of a given ontology with a given status
+    """Edit status of a given ontology with a given status
 
     Args:
         ontology:
@@ -89,7 +89,7 @@ def edit_status(ontology, status):
 
 
 def _set_status(ontology, status):
-    """ set the new status to an ontology and save it in DB
+    """set the new status to an ontology and save it in DB
 
     Args:
         ontology:
