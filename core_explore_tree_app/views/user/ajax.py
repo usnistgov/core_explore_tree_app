@@ -382,7 +382,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
             try:
                 dict_tags_values_main_doc[key] = str(value)
             except:
-                dict_tags_values_main_doc[key] = u"".join(value).encode("utf-8")
+                dict_tags_values_main_doc[key] = "".join(value).encode("utf-8")
         v = dict_tags_values_main_doc[key]
 
     # Process the XML structure that represents the main document to keep only the needed tags and information
@@ -391,7 +391,7 @@ def _load_data_view(node_id, nav_id, data_id, from_tree=True):
         try:
             text = str(child.text)
         except:
-            text = u"".join(child.text).encode("utf-8")
+            text = "".join(child.text).encode("utf-8")
         # If the xml tag is in our dict of tags and values from the main document
         # and its value = dict_tags_values_main_doc[child.tag] we keep the text in the XML structure
         # else we remove the text
